@@ -53,5 +53,14 @@ describe('finder', function() {
 					assert.equal('group', entities[1].type);
 				});
 		});
+
+		it('should find short name entity title', function() {
+			return finder.find('NATO', 'ro')
+				.then(function(entities) {
+					console.log('NATO entities', entities);
+					assert.equal(1, entities.length);
+					assert.equal('place', entities[0].type);
+				});
+		});
 	});
 });

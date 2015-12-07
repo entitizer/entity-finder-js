@@ -1,6 +1,6 @@
 # entity-finder
 
-A nodejs Named entity finder. **entity-finder** will find the internet(wikipedia, ...) for an entity and return the most correct answers.
+A nodejs Named entity finder. **entity-finder** will search the internet(wikipedia, ...) for an entity and return the most correct answers.
 
 
 ## API
