@@ -8,27 +8,49 @@ describe('finder', function() {
 		it('should find entity type', function() {
 			return finder.find('Moldova', 'ro')
 				.then(function(entities) {
+					// console.log('Moldova entities', entities);
 					assert.equal(1, entities.length);
 					assert.equal('place', entities[0].type);
+					assert.equal('ro', entities[0].lang);
 				});
 		});
 
 		it('should find Disambiguation entity', function() {
 			return finder.find('Adrian Ursu', 'ro')
 				.then(function(entities) {
-					assert.equal(1, entities.length);
-					assert.equal(true, entities[0].isDisambiguation);
+					// console.log('Adrian Ursu entities', entities);
+					assert.equal(2, entities.length);
+					assert.equal('jurnalist', entities[0].specialName);
+					assert.equal('person', entities[0].type);
+					assert.equal('cântăreț', entities[1].specialName);
+					// assert.equal('person', entities[1].type);
 				});
 		});
 
-		it('should find Disambiguation entity title', function() {
+		it('should NOT find Disambiguation entity title', function() {
 			return finder.find('Moldova (dezambiguizare)', 'ro')
 				.then(function(entities) {
+					// console.log('Moldova (dezambiguizare) entities', entities);
+					assert.equal(0, entities.length);
+				});
+		});
+
+		it('should find abbr entity title', function() {
+			return finder.find('PLDM', 'ro')
+				.then(function(entities) {
+					// console.log('PLDM entities', entities);
 					assert.equal(1, entities.length);
-					assert.equal(true, entities[0].isDisambiguation);
-					assert.equal(true, entities[0].hasDisambiguationTitle);
-					assert.equal('Moldova', entities[0].simpleTitle);
-					assert.equal('dezambiguizare', entities[0].specialTitle);
+					assert.equal('group', entities[0].type);
+				});
+		});
+
+		it('should find short name entity title', function() {
+			return finder.find('Ministerul Educatiei', 'ro')
+				.then(function(entities) {
+					// console.log('Ministerul Educatiei entities', entities);
+					assert.equal(2, entities.length);
+					// assert.equal('group', entities[0].type);
+					assert.equal('group', entities[1].type);
 				});
 		});
 	});
