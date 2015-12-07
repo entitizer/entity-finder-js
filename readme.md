@@ -20,14 +20,16 @@ Finds entities. Returns an array of entities ordered by relevance.
 ### Entity object:
 
 - **name** (String) - Entity name;
-- **simpleName** (String) - Entity simple name;
-- **specialName** (String) - Entity special name;
+- **type** (String) - Entity type: `place`, `person`, `group`;
 - **wikiPage** (Object) - Wikipedia page info:
   - **title** (String) - Wikipedia page title;
   - **pageid** (Number) - Wikipedia page id;
   - **langlinks** (Object[]) - Wikipedia langlinks:
   - **redirects** (Object[]) - Wikipedia redirects:
   - **categories** (Object[]) - Wikipedia categories:
+- **details** (Object) - Entity details:
+- **simpleName** (String) - Entity simple name;
+- **specialName** (String) - Entity special name;
 
 
 ## Algorithm
