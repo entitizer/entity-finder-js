@@ -1,6 +1,6 @@
 {
   "name": "entity-finder",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Named entity finder",
   "main": "./lib/index.js",
   "directories": {
