@@ -1,0 +1,37 @@
+{
+  "name": "entity-finder",
+  "version": "0.0.1",
+  "description": "Named entity finder",
+  "main": "./lib/index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "bluebird": "^3.0.6",
+    "lodash": "^3.10.1",
+    "wikipedia-data": "^0.1.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.3.4"
+  },
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha -t 8000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/entitizer/entity-finder-js.git"
+  },
+  "keywords": [
+    "entity",
+    "named-entity",
+    "finder",
+    "entities",
+    "ner"
+  ],
+  "author": "Dumitru Cantea",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/entitizer/entity-finder-js/issues"
+  },
+  "homepage": "https://github.com/entitizer/entity-finder-js#readme"
+}
