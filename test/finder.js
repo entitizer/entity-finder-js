@@ -6,7 +6,9 @@ var finder = require('../lib');
 describe('finder', function() {
 	describe('#find', function() {
 		it('should find entity type', function() {
-			return finder.find('Moldova', 'ro')
+			return finder.find('Moldova', 'ro', {
+					limit: 1
+				})
 				.then(function(entities) {
 					// console.log('Moldova entities', entities);
 					assert.equal(1, entities.length);
@@ -15,14 +17,26 @@ describe('finder', function() {
 				});
 		});
 
-		it('should find Disambiguation entity', function() {
+		it('should filter Disambiguation entity', function() {
 			return finder.find('Adrian Ursu', 'ro')
 				.then(function(entities) {
 					// console.log('Adrian Ursu entities', entities);
 					assert.equal(2, entities.length);
-					assert.equal('jurnalist', entities[0].specialName);
-					assert.equal('person', entities[0].type);
-					assert.equal('cântăreț', entities[1].specialName);
+					// assert.equal('jurnalist', entities[0].specialName);
+					// assert.equal('person', entities[0].type);
+					// assert.equal('cântăreț', entities[1].specialName);
+					// assert.equal('person', entities[1].type);
+				});
+		});
+
+		it('should? NOT find a complex entity!!!', function() {
+			return finder.find('Adrian Ursu cântăreț', 'ro')
+				.then(function(entities) {
+					// console.log('Adrian Ursu entities', entities);
+					assert.equal(0, entities.length);
+					// assert.equal('jurnalist', entities[0].specialName);
+					// assert.equal('person', entities[0].type);
+					// assert.equal('cântăreț', entities[1].specialName);
 					// assert.equal('person', entities[1].type);
 				});
 		});
@@ -57,7 +71,7 @@ describe('finder', function() {
 		it('should find short name entity title', function() {
 			return finder.find('NATO', 'ro')
 				.then(function(entities) {
-					console.log('NATO entities', entities);
+					// console.log('NATO entities', entities);
 					assert.equal(1, entities.length);
 					assert.equal('place', entities[0].type);
 				});
