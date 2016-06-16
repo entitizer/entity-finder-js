@@ -76,5 +76,14 @@ describe('finder', function() {
 					assert.equal('place', entities[0].type);
 				});
 		});
+
+		it('should omit Disambiguation pages', function() {
+			return finder.find('Butuceni', 'ro')
+				.then(function(entities) {
+					// console.log('Butuceni entities', entities);
+					assert.equal(2, entities.length);
+					// assert.equal('place', entities[0].type);
+				});
+		});
 	});
 });
