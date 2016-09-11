@@ -7,7 +7,7 @@ describe('page details', function() {
 	it('should parse a person', function() {
 		return pageDetails('Vlad_Filat', { timeout: 20 * 1000 })
 			.then(function(details) {
-				console.log(details);
+				// console.log(details);
 				assert.equal('person', details.type);
 				assert.equal('Filat', details.surname);
 			});
