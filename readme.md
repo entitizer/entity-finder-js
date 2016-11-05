@@ -33,7 +33,6 @@ Finds entities. Returns an array of entities ordered by relevance.
   - **categories** (Object[]) - Wikipedia categories:
   - **simpleName** (String) - Entity simple name;
   - **specialName** (String) - Entity special name;
-- **details** (Object) - Entity details:
 - **names** (String[]) - An array of alt names;
 - **types** (String[]) - A list of object types: dbo:Person, schema:Person, etc.
 - **props** (Object) - Some extra properties
