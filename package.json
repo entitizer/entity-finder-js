@@ -3,13 +3,14 @@
   "version": "0.2.0",
   "description": "Named entity finder",
   "main": "./lib/index.js",
-  "directories": {
-    "test": "test"
+  "engines": {
+    "node": ">=4.0.0"
   },
   "dependencies": {
     "bluebird": "^3.0.6",
     "debug": "^2.2.0",
     "lodash": "^3.10.1",
+    "n3": "^0.8.1",
     "request": "^2.72.0",
     "wikipedia-data": "^0.1.0"
   },
@@ -17,7 +18,7 @@
     "mocha": "^2.3.4"
   },
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha -t 8000"
+    "test": "./node_modules/mocha/bin/mocha -t 5000"
   },
   "repository": {
     "type": "git",

@@ -1,14 +1,11 @@
 {
   "env": {
-    "node": true
+    "mocha": true
   },
   "rules": {
-    "no-unused-vars": 1
   },
   "globals": {
     "describe": false,
-    "it": false,
-    "before": false,
-    "after": false
+    "it": false
   }
 }

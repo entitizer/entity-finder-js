@@ -1,6 +1,6 @@
 'use strict';
 
-var assert = require('assert');
+// var assert = require('assert');
 var request = require('../lib/request');
 
 describe('request', function() {
