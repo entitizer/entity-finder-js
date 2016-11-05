@@ -18,7 +18,7 @@
     "mocha": "^2.3.4"
   },
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha -t 5000"
+    "test": "./node_modules/mocha/bin/mocha -t 10000"
   },
   "repository": {
     "type": "git",

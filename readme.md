@@ -17,7 +17,7 @@ Finds entities. Returns an array of entities ordered by relevance.
   - **details** (Boolean) - Entity details. Default: `true`.
   - **filterDis** (Boolean) - Filter disambiguations. Default: `true`.
   - **filterDisDeep** (Boolean) - Filter disambiguation pages by testing parent categories. Default: `false`. Useful for filtering `hndis`, etc.
-  - **tag** ([String]) (null) - Order results by tags score.
+  - **tags** ([String]) (null) - Order results by tags score.
 
 ### Entity object:
 
@@ -44,3 +44,13 @@ Finds entities. Returns an array of entities ordered by relevance.
 2. For found names get wikipedia pages;
 3. Filter pages;
 4. For every wikipedia page find details;
+
+
+## Changelog
+
+### v0.2.0 - November 4, 2016
+
+- >= node4;
+- new wikipedia parser: n3 - better performance;
+- added option: `tags`;
+- news model fields: `types` and `props`;
