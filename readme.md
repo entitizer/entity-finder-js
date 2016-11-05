@@ -17,6 +17,7 @@ Finds entities. Returns an array of entities ordered by relevance.
   - **details** (Boolean) - Entity details. Default: `true`.
   - **filterDis** (Boolean) - Filter disambiguations. Default: `true`.
   - **filterDisDeep** (Boolean) - Filter disambiguation pages by testing parent categories. Default: `false`. Useful for filtering `hndis`, etc.
+  - **tag** ([String]) (null) - Order results by tags score.
 
 ### Entity object:
 
@@ -34,6 +35,8 @@ Finds entities. Returns an array of entities ordered by relevance.
   - **specialName** (String) - Entity special name;
 - **details** (Object) - Entity details:
 - **names** (String[]) - An array of alt names;
+- **types** (String[]) - A list of object types: dbo:Person, schema:Person, etc.
+- **props** (Object) - Some extra properties
 
 
 ## Algorithm
