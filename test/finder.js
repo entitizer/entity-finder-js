@@ -29,6 +29,17 @@ describe('finder', function() {
 				});
 		});
 
+		it('should order entities by tags score', function() {
+			return finder.find('Adrian Ursu', 'ro', {tags: 'moldova'})
+				.then(function(entities) {
+					// console.log('Adrian Ursu entities', entities);
+					// assert.equal(2, entities.length);
+					assert.equal('jurnalist', entities[1].wikiPage.specialTitle);
+					assert.equal('cântăreț', entities[0].wikiPage.specialTitle);
+					// assert.equal('person', entities[1].type);
+				});
+		});
+
 		it('should (NOT?) find a complex entity!!!', function() {
 			return finder.find('Adrian Ursu cântăreț', 'ro')
 				.then(function(entities) {
@@ -83,6 +94,14 @@ describe('finder', function() {
 					// console.log('Butuceni entities', entities);
 					assert.equal(2, entities.length);
 					// assert.equal('place', entities[0].type);
+				});
+		});
+
+		it('should order entities by tags score', function() {
+			return finder.find('Ministry of External Affairs', 'en', {tags: 'Soviet Union'})
+				.then(function(entities) {
+					// console.log('entities', entities);
+					assert.equal('Soviet Union', entities[0].wikiPage.specialTitle);
 				});
 		});
 	});
