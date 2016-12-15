@@ -121,4 +121,13 @@ describe('finder', function() {
 				});
 		});
 	});
+
+	describe('#findTitles', function() {
+		it('find an en:Moscow', function() {
+			return finder.findTitles('Moscow', 'en', 1)
+				.then(function(titles) {
+					assert.equal('Moscow', titles[0].title);
+				});
+		});
+	});
 });
