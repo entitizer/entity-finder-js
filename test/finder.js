@@ -30,7 +30,7 @@ describe('finder', function() {
 		});
 
 		it('should order entities by tags score', function() {
-			return finder.find('Adrian Ursu', 'ro', {tags: 'moldova'})
+			return finder.find('Adrian Ursu', 'ro', { tags: 'moldova' })
 				.then(function(entities) {
 					// console.log('Adrian Ursu entities', entities);
 					// assert.equal(2, entities.length);
@@ -98,10 +98,26 @@ describe('finder', function() {
 		});
 
 		it('should order entities by tags score', function() {
-			return finder.find('Ministry of External Affairs', 'en', {tags: 'Soviet Union'})
+			return finder.find('Ministry of External Affairs', 'en', { tags: 'Soviet Union' })
 				.then(function(entities) {
 					// console.log('entities', entities);
 					assert.equal('Soviet Union', entities[0].wikiPage.specialTitle);
+				});
+		});
+
+		it('should order entities by tags score', function() {
+			return finder.find('Ministry of External Affairs', 'en', { tags: 'Soviet Union' })
+				.then(function(entities) {
+					// console.log('entities', entities);
+					assert.equal('Soviet Union', entities[0].wikiPage.specialTitle);
+				});
+		});
+
+		it('ro:ro:adrian ursu', function() {
+			return finder.find('adrian ursu', 'ro', { tags: 'jurnalist' })
+				.then(function(entities) {
+					// console.log('entities', entities);
+					assert.equal('jurnalist', entities[0].wikiPage.specialTitle);
 				});
 		});
 	});
