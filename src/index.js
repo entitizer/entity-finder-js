@@ -31,6 +31,7 @@ function wikiPages(name, lang, options) {
 		})
 		.then(function(pages) {
 			if (pages && pages.length > 1 && options.tags) {
+				debug('sortBy', name, _.map(pages, 'title'));
 				const titles = name.split('|');
 				return _.sortBy(pages, (page) => {
 					const index = titles.indexOf(page.title);

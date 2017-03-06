@@ -112,9 +112,15 @@ describe('finder', function() {
 					assert.equal('Soviet Union', entities[0].wikiPage.specialTitle);
 				});
 		});
-
+		it('ro:adrian ursu', function() {
+			return finder.find('adrian ursu', 'ro')
+				.then(function(entities) {
+					// console.log('entities', entities);
+					assert.equal('jurnalist', entities[0].wikiPage.specialTitle);
+				});
+		});
 		it('ro:ro:adrian ursu', function() {
-			return finder.find('adrian ursu', 'ro', { tags: 'jurnalist' })
+			return finder.find('adrian ursu', 'ro', { tags: 'România' })
 				.then(function(entities) {
 					// console.log('entities', entities);
 					assert.equal('jurnalist', entities[0].wikiPage.specialTitle);

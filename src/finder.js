@@ -1,5 +1,6 @@
 'use strict';
 
+const debug = require('debug')('entity-finder');
 const utils = require('./utils');
 const wikiData = require('wikipedia-data');
 const wiki = require('./wikipedia');
@@ -46,6 +47,7 @@ function isComplex(name, title) {
 
 function orderByTags(list, tags) {
 	if (list.length > 1 && tags && tags.length > 0) {
+		debug('Unordered by tags', utils._.map(list, 'title'));
 		const sortList = list.filter((item, i) => {
 				let score = 0;
 				tags.forEach((tag) => {
@@ -75,6 +77,7 @@ function orderByTags(list, tags) {
 				delete sortList[i].tempIndex;
 			}
 		}
+		debug('Ordered by tags', utils._.map(list, 'title'));
 	}
 
 	return list;
@@ -90,6 +93,7 @@ function findTitles(name, lang, limit, tags) {
 				title.description = result[2][i];
 				list.push(title);
 			}
+			debug('findTitles', name, lang, limit, tags);
 			return orderByTags(list, tags);
 		})
 		.then(function(list) {
