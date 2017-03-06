@@ -6,6 +6,15 @@ const wikiData = require('wikipedia-data');
 import * as utils from './utils';
 import * as wiki from './wikipedia';
 
+export type FinderOptionsType = {
+	limit?: number,
+	tags?: RegExp[],
+};
+
+const OPTIONS: FinderOptionsType = {
+	limit: 2
+};
+
 function getDisambiguationNames(lang) {
 	return wikiData.getDisambiguationNames2()[lang];
 }
@@ -46,7 +55,7 @@ function isComplex(name: string, title) {
 	return false;
 }
 
-function orderByTags(list, tags): utils.PageTitleType[] {
+function orderByTags(list, tags?: RegExp[]): utils.PageTitleType[] {
 	if (list.length > 1 && tags && tags.length > 0) {
 		debug('Unordered by tags', utils._.map(list, 'title'));
 		const sortList = list.filter((item, i) => {
@@ -84,8 +93,13 @@ function orderByTags(list, tags): utils.PageTitleType[] {
 	return list;
 }
 
-export function findTitles(name: string, lang: string, limit?: number, tags?: RegExp[]): Promise<utils.PageTitleType[]> {
+export function findTitles(name: string, lang: string, options?: FinderOptionsType): Promise<utils.PageTitleType[]> {
 	name = name.split('|')[0];
+
+	options = utils._.defaults({}, options, OPTIONS);
+
+	const limit = options.limit;
+	const tags = options.tags;
 
 	const wordsCount = utils.countWords(name);
 	return wiki.api.openSearch(lang, name)

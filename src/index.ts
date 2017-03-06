@@ -18,7 +18,7 @@ export type EntityType = {
 	types?: string[],
 	names?: string[]
 	props?: {},
-	englishName?:string
+	englishName?: string
 };
 
 export type OptionsType = {
@@ -185,7 +185,7 @@ export function find(name: string, lang: string, options?: OptionsType): Promise
 
 	// console.log('find', name);
 
-	return findTitles(name, lang, options.limit + 1, tags)
+	return findTitles(name, lang, { limit: options.limit + 1, tags })
 		.then(function (titles) {
 			if (titles.length === 0) {
 				titles = [{ title: name }];
