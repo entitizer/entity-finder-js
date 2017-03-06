@@ -2,7 +2,6 @@
 
 A nodejs Named entity finder. **entity-finder** will search the internet(wikipedia, ...) for an entity and return the most correct answers.
 
-
 ## API
 
 ### find(name, lang, options)
@@ -22,7 +21,7 @@ Finds entities. Returns an array of entities ordered by relevance.
 ### Entity object:
 
 - **name** (String) - Entity name;
-- **type** (String) - Entity type: `place`, `person`, `group`;
+- **type** (String) - Entity type: `place`, `person`, `org`;
 - **wikiId** (Number) - Wikipedia page id;
 - **lang** (String) - Language code.
 - **wikiPage** (Object) - Wikipedia page info:
@@ -48,9 +47,14 @@ Finds entities. Returns an array of entities ordered by relevance.
 
 ## Changelog
 
+### v0.3.0 - March 6, 2016
+
+- TypeScript code
+- **changed entity type**: `group` to `org`
+
 ### v0.2.0 - November 4, 2016
 
-- >= node4;
+- node4;
 - new wikipedia parser: n3 - better performance;
 - added option: `tags`;
 - news model fields: `types` and `props`;
