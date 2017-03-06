@@ -64,7 +64,7 @@ describe('finder', function() {
 				.then(function(entities) {
 					// console.log('PLDM entities', entities);
 					assert.equal(1, entities.length);
-					assert.equal('group', entities[0].type);
+					assert.equal('org', entities[0].type);
 				});
 		});
 
@@ -74,8 +74,8 @@ describe('finder', function() {
 					// console.log('Ministerul Educatiei entities', entities);
 					assert.equal(2, entities.length);
 					// console.log(entities);
-					// assert.equal('group', entities[0].type);
-					// assert.equal('group', entities[1].type);
+					// assert.equal('org', entities[0].type);
+					// assert.equal('org', entities[1].type);
 				});
 		});
 
@@ -84,7 +84,7 @@ describe('finder', function() {
 				.then(function(entities) {
 					// console.log('NATO entities', entities);
 					assert.equal(1, entities.length);
-					assert.equal('group', entities[0].type);
+					assert.equal('org', entities[0].type);
 				});
 		});
 

@@ -193,7 +193,7 @@ export const DATA_PROPS: { key: string, name: string, type?: string, value?: any
 		name: 'gender'
 	},
 	//
-	// GROUP
+	// ORG
 	//
 	{
 		key: 'http://dbpedia.org/ontology/foundingDate',

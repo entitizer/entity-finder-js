@@ -6,7 +6,7 @@ import { Promise } from '../../utils';
 function getType(types) {
 	const data = {
 		person: ['dbo:Person', 'schema:Person'],
-		group: ['dbo:Company', 'schema:Organization', 'dbo:Organisation'],
+		org: ['dbo:Company', 'schema:Organization', 'dbo:Organisation'],
 		place: ['dbo:Place', 'schema:Place', 'dbo:Location']
 	};
 
