@@ -1,11 +1,10 @@
 'use strict';
 
-const utils = require('./utils');
-const _ = utils._;
-const Promise = utils.Promise;
 const request = require('request');
 
-module.exports = function(options) {
+import { _, Promise } from './utils';
+
+export default function (options: any): Promise<any> {
 	options = _.defaults(options, {
 		method: 'GET',
 		json: true,
@@ -16,8 +15,8 @@ module.exports = function(options) {
 		timeout: 5 * 1000
 	});
 
-	return new Promise(function(resolve, reject) {
-		request(options, function(error, response, body) {
+	return new Promise(function (resolve, reject) {
+		request(options, function (error, response, body) {
 			if (error) {
 				return reject(error);
 			}

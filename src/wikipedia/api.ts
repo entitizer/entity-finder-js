@@ -1,8 +1,7 @@
 'use strict';
 
-const utils = require('../utils');
-const _ = utils._;
-const request = require('../request');
+import { _, Promise } from '../utils';
+import request from '../request';
 
 const OPTIONS = {
 	qs: {
@@ -15,15 +14,14 @@ const OPTIONS = {
  */
 function createOptions(lang, qs) {
 	const options = {
-		qs: _.defaults({}, qs || {}, OPTIONS.qs)
+		qs: _.defaults({}, qs || {}, OPTIONS.qs),
+		url: 'https://' + lang + '.wikipedia.org/w/api.php'
 	};
-
-	options.url = 'https://' + lang + '.wikipedia.org/w/api.php';
 
 	return options;
 }
 
-const query = exports.query = function(lang, qs) {
+export function query(lang: string, qs?: any): Promise<any> {
 	qs.action = 'query';
 
 	const options = createOptions(lang, qs);
@@ -31,12 +29,13 @@ const query = exports.query = function(lang, qs) {
 	return request(options);
 };
 
-exports.openSearch = function(lang, search, redirects) {
+export function openSearch(lang: string, search: string, redirects?: string) {
 	const qs = {
 		search: search,
 		action: 'opensearch',
 		redirects: redirects || 'resolve',
-		suggest: true
+		suggest: true,
+		profile: 'fuzzy'
 	};
 
 	const options = createOptions(lang, qs);
@@ -44,7 +43,7 @@ exports.openSearch = function(lang, search, redirects) {
 	return request(options);
 };
 
-exports.search = function(lang, srsearch) {
+export function search(lang: string, srsearch: string) {
 	const qs = {
 		srsearch: srsearch,
 		list: 'search',

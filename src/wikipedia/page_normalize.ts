@@ -1,18 +1,17 @@
-'use strict';
 
 const wikiData = require('wikipedia-data');
-const utils = require('../utils');
+import { PageType, formatTitle } from '../utils';
 
 function fixLanglinks(page) {
 	page.langlinks = page.langlinks || [];
 
-	page.langlinks.forEach(function(ll) {
+	page.langlinks.forEach(function (ll) {
 		ll.title = ll.title || ll['*'];
 		delete ll['*'];
 	});
 }
 
-function fixDisambiguation(page) {
+function fixDisambiguation(page: PageType) {
 	if (!page.isDisambiguation) {
 		const disCategory = wikiData.getDisambiguationCategories2()[page.pagelanguage];
 		page.categories = page.categories || [];
@@ -26,8 +25,8 @@ function fixDisambiguation(page) {
 	}
 }
 
-function fixTemplate(page) {
-	if (page.templates && page.templates.length > 0) {
+function fixTemplate(page: PageType) {
+	if (page.templates && page.templates.length) {
 		const disName = ':' + wikiData.getDisambiguationNames2()[page.pagelanguage];
 		for (let i = page.templates.length - 1; i >= 0; i--) {
 			const t = page.templates[i];
@@ -42,19 +41,19 @@ function fixTemplate(page) {
 	}
 }
 
-function fixTitle(page) {
-	const title = utils.formatTitle(page.title);
-	if (title.specialTitle) {
-		page.specialTitle = title.specialTitle;
-		page.simpleTitle = title.simpleTitle;
+function fixTitle(page: PageType) {
+	const title = formatTitle(page.title);
+	if (title.special) {
+		page.specialTitle = title.special;
+		page.simpleTitle = title.simple;
 		const disName = wikiData.getDisambiguationNames2()[page.pagelanguage];
-		if (disName === title.specialTitle || disName.toLowerCase() === title.specialTitle) {
-			page.isDisambiguation = page.hasDisambiguationTitle = true;
+		if (disName === title.special || disName.toLowerCase() === title.special) {
+			page.isDisambiguation = true;
 		}
 	}
 }
 
-module.exports = function(page) {
+export function normalize(page: PageType) {
 	fixLanglinks(page);
 	fixTemplate(page);
 	fixDisambiguation(page);

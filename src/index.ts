@@ -2,13 +2,34 @@
 
 const debug = require('debug')('entity-finder');
 
-const utils = require('./utils');
-const _ = utils._;
-const Promise = utils.Promise;
-const wiki = require('./wikipedia');
-const finder = require('./finder');
+import { _, Promise, PageType } from './utils';
+import * as wiki from './wikipedia';
+import * as finder from './finder';
 
-const OPTIONS = {
+export const findTitles = finder.findTitles;
+
+export type EntityType = {
+	name: string,
+	wikiId: number,
+	wikiPage: PageType,
+	description?: string,
+	lang?: string,
+	type?: string,
+	types?: string[],
+	names?: string[]
+	props?: {},
+	englishName?:string
+};
+
+export type OptionsType = {
+	limit?: number,
+	details?: boolean,
+	filterDis?: boolean,
+	filterDisDeep?: boolean,
+	tags?: string[] | string
+};
+
+const OPTIONS: OptionsType = {
 	limit: 2,
 	details: true,
 	filterDis: true,
@@ -16,20 +37,22 @@ const OPTIONS = {
 	tags: null
 };
 
-function wikiPages(name, lang, options) {
+function wikiPages(name: string, lang: string, options: OptionsType): Promise<PageType[]> {
 	return wiki.pagesByTitles(name, lang)
-		.filter(page => {
-			return page.pageid && page.pageid > 0;
+		.then(function (pages) {
+			return pages.filter(page => {
+				return page.pageid && page.pageid > 0;
+			});
 		})
-		.then(function(pages) {
+		.then(function (pages) {
 			if (options.filterDis) {
-				return pages.filter(function(page) {
+				return pages.filter(function (page) {
 					return !page.isDisambiguation;
 				});
 			}
 			return pages;
 		})
-		.then(function(pages) {
+		.then(function (pages) {
 			if (pages && pages.length > 1 && options.tags) {
 				debug('sortBy', name, _.map(pages, 'title'));
 				const titles = name.split('|');
@@ -53,7 +76,7 @@ function wikiPageDetails(page) {
 }
 
 function formatEntity(page, details) {
-	const entity = {
+	const entity: EntityType = {
 		name: page.title,
 		wikiId: page.pageid,
 		wikiPage: page,
@@ -77,7 +100,7 @@ function formatEntity(page, details) {
 
 	if (page.redirects) {
 		entity.names = [];
-		page.redirects.forEach(function(item) {
+		page.redirects.forEach(function (item) {
 			entity.names.push(item.title);
 		});
 	}
@@ -103,10 +126,10 @@ function getWikiPageDetails(page, options) {
 function passFilterByDis(page, options) {
 	if (options.filterDisDeep && page.categories && page.categories.length > 0) {
 		const title = _.take(_.pluck(page.categories, 'title'), 5).join('|');
-		return wiki.pageQuery(page.pagelanguage, 'titles', title, {
+		return wiki.pageQuery.query(page.pagelanguage, 'titles', title, {
 			prop: 'info|categories|templates',
 			tllimit: 'max'
-		}).then(function(pages) {
+		}).then(function (pages) {
 			return !_.any(pages, {
 				format: 'disambiguation'
 			});
@@ -115,32 +138,34 @@ function passFilterByDis(page, options) {
 	return true;
 }
 
-function getEntities(name, lang, options) {
-	options = _.defaults(options || {}, OPTIONS);
+function getEntities(name: string, lang: string, options: OptionsType): Promise<EntityType[]> {
+	// options = _.defaults(options || {}, OPTIONS);
 	const entities = [];
 	return wikiPages(name, lang, options)
-		.mapSeries(page => {
-			if (entities.length === options.limit) {
-				return null;
-			}
-			return Promise.props({
+		.then(function (pages) {
+			return Promise.each(pages, page => {
+				if (entities.length === options.limit) {
+					return null;
+				}
+				return Promise.props({
 					details: getWikiPageDetails(page, options),
 					passDis: passFilterByDis(page, options)
 				})
-				.then(props => {
-					if (props.passDis) {
-						entities.push(formatEntity(page, props.details));
-					} else {
-						debug(page.title + ': didn`t pass filter');
-					}
-				});
+					.then((props: any) => {
+						if (props.passDis) {
+							entities.push(formatEntity(page, props.details));
+						} else {
+							debug(page.title + ': didn`t pass filter');
+						}
+					});
+			});
 		})
-		.then(function() {
+		.then(function () {
 			return entities;
 		});
 }
 
-exports.find = function(name, lang, options) {
+export function find(name: string, lang: string, options?: OptionsType): Promise<EntityType[]> {
 	options = _.defaults(options || {}, OPTIONS);
 
 	debug('options', options);
@@ -150,16 +175,18 @@ exports.find = function(name, lang, options) {
 		options.tags = [options.tags];
 	}
 
+	let tags: RegExp[];
+
 	if (options.tags) {
-		options.tags = options.tags.map((tag) => {
+		tags = options.tags.map((tag) => {
 			return new RegExp('(^|\\b)' + tag + '(\\b|$)', 'gi');
 		});
 	}
 
 	// console.log('find', name);
 
-	return finder.findTitles(name, lang, options.limit + 1, options.tags)
-		.then(function(titles) {
+	return findTitles(name, lang, options.limit + 1, tags)
+		.then(function (titles) {
 			if (titles.length === 0) {
 				titles = [{ title: name }];
 				// return [];
@@ -170,8 +197,8 @@ exports.find = function(name, lang, options) {
 			debug('finding titles:', name);
 
 			return getEntities(name, lang, options)
-				.then(function(entities) {
-					entities.forEach(function(entity) {
+				.then(function (entities) {
+					entities.forEach(function (entity) {
 						if (!entity.description) {
 							const title = _.find(titles, {
 								title: entity.name
@@ -184,6 +211,4 @@ exports.find = function(name, lang, options) {
 					return entities;
 				});
 		});
-};
-
-exports.findTitles = finder.findTitles;
+}

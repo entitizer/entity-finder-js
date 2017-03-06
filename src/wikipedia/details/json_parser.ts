@@ -1,18 +1,17 @@
 'use strict';
 
-const request = require('../../request');
-const utils = require('../../utils');
-const _ = utils._;
-const helpers = require('./helpers');
+import request from '../../request';
+import { _, Promise } from '../../utils';
+import * as helpers from './helpers';
 
 const DATA_TYPES = helpers.DATA_TYPES;
 const DATA_PROPS = helpers.DATA_PROPS;
 const NAMESPACES = helpers.NAMESPACES;
 const parseResource = helpers.parseResource;
 
-function getTypes(data) {
+function getTypes(data): string[] {
 	data = data['http://www.w3.org/1999/02/22-rdf-syntax-ns#type'] || [];
-	const types = [];
+	const types: string[] = [];
 	let result;
 	data.forEach((item) => {
 		for (let i = DATA_TYPES.length - 1; i >= 0; i--) {
@@ -30,7 +29,7 @@ function getTypes(data) {
 }
 
 function getProps(data) {
-	const props = {};
+	const props: any = {};
 
 	function getPropItem(item, info) {
 		let value = item.value;
@@ -63,14 +62,14 @@ function getProps(data) {
 	return props;
 }
 
-function getDetails(data, title) {
+function getDetails(data, title): helpers.EntityDetailsType {
 	const resourceProp = 'http://dbpedia.org/resource/' + encodeURI(title);
 	const resource = data[resourceProp];
 	if (!resource) {
 		return null;
 	}
 
-	const details = {};
+	const details: helpers.EntityDetailsType = {};
 
 	details.types = getTypes(resource);
 	details.props = getProps(resource);
@@ -78,7 +77,7 @@ function getDetails(data, title) {
 	return details;
 }
 
-module.exports = (title, options) => {
+export function parse(title, options): Promise<helpers.EntityDetailsType> {
 	title = title.replace(/ /g, '_');
 	const url = 'http://dbpedia.org/data/' + encodeURI(title) + '.json';
 	options = _.defaults({

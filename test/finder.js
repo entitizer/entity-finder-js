@@ -120,9 +120,8 @@ describe('finder', function() {
 				});
 		});
 		it('ro:ro:adrian ursu', function() {
-			return finder.find('adrian ursu', 'ro', { tags: 'România' })
+			return finder.find('adrian ursu', 'ro', { tags: 'jurnalist' })
 				.then(function(entities) {
-					// console.log('entities', entities);
 					assert.equal('jurnalist', entities[0].wikiPage.specialTitle);
 				});
 		});

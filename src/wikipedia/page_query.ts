@@ -1,9 +1,9 @@
-'use strict';
 
-const wikiApi = require('./api');
-const pageNormalize = require('./page_normalize');
+import { query as apiQuery } from './api';
+import { normalize as pageNormalize } from './page_normalize';
+import { PageType, Promise } from '../utils';
 
-module.exports = function(lang, refName, refValue, qs) {
+export function query(lang: string, refName: string, refValue: string, qs?: any): Promise<PageType[]> {
 	qs = qs || {
 		prop: 'extracts|categories|langlinks|redirects|info|pageimages|imageinfo|images|templates',
 		lllimit: 'max',
@@ -16,14 +16,15 @@ module.exports = function(lang, refName, refValue, qs) {
 
 	qs[refName] = refValue;
 
-	return wikiApi.query(lang, qs)
-		.then(function(result) {
-			const pages = [];
+	return apiQuery(lang, qs)
+		.then(function (result) {
+			const pages: PageType[] = [];
 			if (result && result.query && result.query.pages) {
 				for (let pageId in result.query.pages) {
 					const page = result.query.pages[pageId];
 					pageNormalize(page);
 					pages.push(page);
+					// console.log(page);
 				}
 			}
 

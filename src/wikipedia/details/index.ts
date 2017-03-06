@@ -1,5 +1,8 @@
 'use strict';
 
+import { EntityDetailsType } from './helpers';
+import { Promise } from '../../utils';
+
 function getType(types) {
 	const data = {
 		person: ['dbo:Person', 'schema:Person'],
@@ -18,14 +21,14 @@ function getType(types) {
 	return null;
 }
 
-module.exports = (title, options, parserName) => {
+export function parse(title: string, options?: any, parserName?: string): Promise<EntityDetailsType> {
 	let parser;
 	if (parserName === 'json') {
 		parser = require('./json_parser');
 	} else {
 		parser = require('./n3_parser');
 	}
-	return parser(title, options)
+	return parser.parse(title, options)
 		.then((details) => {
 			if (details) {
 				if (details.types) {

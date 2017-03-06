@@ -1,10 +1,8 @@
 'use strict';
 
 const request = require('request');
-const utils = require('../../utils');
-const _ = utils._;
-const Promise = utils.Promise;
-const helpers = require('./helpers');
+import { _, Promise } from '../../utils';
+import * as helpers from './helpers';
 const N3 = require('n3');
 const parser = new N3.Parser();
 const N3Util = N3.Util;
@@ -56,7 +54,7 @@ function getDetailItem(details, item) {
 	}
 }
 
-module.exports = (title, options) => {
+export function parse(title, options): Promise<helpers.EntityDetailsType> {
 	title = title.replace(/ /g, '_');
 
 	const subject = 'http://dbpedia.org/resource/' + title;

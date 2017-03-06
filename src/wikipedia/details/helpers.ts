@@ -6,7 +6,12 @@ const parseFloatFixed = (digits) => {
 	};
 };
 
-exports.parseResource = (value) => {
+export type EntityDetailsType = {
+	types?: string[],
+	props?: object
+};
+
+export function parseResource(value) {
 	const result = /^http:\/\/dbpedia\.org\/resource\/([^\/]+)$/.exec(value);
 	if (result) {
 		return decodeURIComponent(result[1].replace(/_/g, ' '));
@@ -14,7 +19,7 @@ exports.parseResource = (value) => {
 	return value;
 };
 
-exports.NAMESPACES = {
+export const NAMESPACES = {
 	// http://schema.org/
 	schema: /^http:\/\/schema\.org\/([^\/]+)$/,
 	// http://dbpedia.org/ontology/
@@ -27,9 +32,9 @@ exports.NAMESPACES = {
 	wikidata: /^http:\/\/www\.wikidata\.org\/entity\/([^\/]+)$/
 };
 
-exports.DATA_TYPES = ['schema', 'dbo', 'wikidata'];
+export const DATA_TYPES = ['schema', 'dbo', 'wikidata'];
 
-exports.DATA_PROPS = [
+export const DATA_PROPS: { key: string, name: string, type?: string, value?: any }[] = [
 	//
 	// COMMON
 	//

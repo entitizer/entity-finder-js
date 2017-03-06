@@ -1,11 +1,5 @@
 {
   "env": {
     "mocha": true
-  },
-  "rules": {
-  },
-  "globals": {
-    "describe": false,
-    "it": false
   }
 }

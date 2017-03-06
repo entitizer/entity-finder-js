@@ -3,6 +3,16 @@
   "version": "0.2.3",
   "description": "Named entity finder",
   "main": "./lib/index.js",
+  "types": "./types/index.d.ts",
+  "scripts": {
+    "pretest": "npm run tsc",
+    "test": "mocha -t 10000",
+    "tsc": "tsc",
+    "tscw": "tsc -w",
+    "preversion": "npm run tsc",
+    "postversion": "git push --follow-tags",
+    "prepublish": "npm run tsc"
+  },
   "engines": {
     "node": ">=4.0.0"
   },
@@ -15,10 +25,10 @@
     "wikipedia-data": "^0.1.0"
   },
   "devDependencies": {
-    "mocha": "^2.3.4"
-  },
-  "scripts": {
-    "test": "./node_modules/mocha/bin/mocha -t 10000"
+    "@types/bluebird": "^3.0.37",
+    "@types/node": "^7.0.5",
+    "mocha": "^3.2.0",
+    "typescript": "^2.2.1"
   },
   "repository": {
     "type": "git",
