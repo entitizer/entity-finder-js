@@ -4,9 +4,7 @@ const debug = require('debug')('entity-finder');
 
 import { _, Promise, PageType } from './utils';
 import * as wiki from './wikipedia';
-import * as finder from './finder';
-
-export const findTitles = finder.findTitles;
+import { findTitles, FindTitleOptionsType } from './find_titles';
 
 export type EntityType = {
 	name: string,
@@ -175,17 +173,9 @@ export function find(name: string, lang: string, options?: OptionsType): Promise
 		options.tags = [options.tags];
 	}
 
-	let tags: RegExp[];
-
-	if (options.tags) {
-		tags = options.tags.map((tag) => {
-			return new RegExp('(^|\\b)' + tag + '(\\b|$)', 'gi');
-		});
-	}
-
 	// console.log('find', name);
 
-	return findTitles(name, lang, { limit: options.limit + 1, tags })
+	return findTitles(name, lang, { limit: options.limit + 1, tags: options.tags })
 		.then(function (titles) {
 			if (titles.length === 0) {
 				titles = [{ title: name }];

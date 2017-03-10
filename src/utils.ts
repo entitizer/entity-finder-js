@@ -8,7 +8,8 @@ export type PageTitleType = {
 	title: string,
 	simple?: string,
 	special?: string,
-	description?: string
+	description?: string,
+	isDisambiguation?: boolean
 };
 
 export type PageType = {

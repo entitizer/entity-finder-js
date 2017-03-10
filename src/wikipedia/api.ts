@@ -29,13 +29,14 @@ export function query(lang: string, qs?: any): Promise<any> {
 	return request(options);
 };
 
-export function openSearch(lang: string, search: string, redirects?: string) {
+export function openSearch(lang: string, search: string, redirects?: string, limit?: number) {
 	const qs = {
 		search: search,
 		action: 'opensearch',
 		redirects: redirects || 'resolve',
 		suggest: true,
-		profile: 'fuzzy'
+		profile: 'fuzzy',
+		limit: limit || 10
 	};
 
 	const options = createOptions(lang, qs);
