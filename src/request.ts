@@ -23,8 +23,6 @@ export default function (options: any): Promise<any> {
 		}
 	}
 
-	console.log(options);
-
 	return new Promise(function (resolve, reject) {
 		request(options, function (error, response, body) {
 			if (error) {

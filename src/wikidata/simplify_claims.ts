@@ -70,21 +70,24 @@ export function simplifyClaim(claim, opts: OptionsType = {}) {
             break
     }
 
-    if (opts.keepQualifiers) {
-        const simpleQualifiers = {}
+    // if (opts.keepQualifiers) {
+    const simpleQualifiers = {}
 
-        for (let qualifierProp in qualifiers) {
-            simpleQualifiers[qualifierProp] = qualifiers[qualifierProp]
-                .map(prepareQualifierClaim)
-        }
-
-        return {
-            value,
-            qualifiers: simplifyClaims(simpleQualifiers, opts)
-        };
-    } else {
-        return value
+    for (let qualifierProp in qualifiers) {
+        simpleQualifiers[qualifierProp] = qualifiers[qualifierProp]
+            .map(prepareQualifierClaim)
     }
+    const result = {
+        value,
+        qualifiers: simplifyClaims(simpleQualifiers, opts)
+    };
+    if (Array.isArray(result) && result.length === 0 || Object.keys(result.qualifiers).length === 0) {
+        delete result.qualifiers;
+    }
+    return result;
+    // } else {
+    //     return value
+    // }
 }
 
 const prefixedId = function (datavalue, prefix) {

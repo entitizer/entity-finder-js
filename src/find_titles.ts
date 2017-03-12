@@ -8,7 +8,8 @@ import * as wiki from './wikipedia';
 
 export type FindTitleOptionsType = {
 	limit?: number,
-	tags?: string[]
+	tags?: string[],
+	profile?: string
 };
 
 const OPTIONS: FindTitleOptionsType = {
@@ -29,7 +30,7 @@ export function findTitles(name: string, lang: string, options?: FindTitleOption
 	}
 
 	const wordsCount = utils.countWords(name);
-	return wiki.api.openSearch(lang, name)
+	return wiki.api.openSearch(lang, name, { profile: options.profile, limit: limit + 2 })
 		.then(function (result) {
 			const list = [];
 			for (let i = 0; i < result[1].length; i++) {

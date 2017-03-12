@@ -20,7 +20,7 @@ export type SimpleEntityType = {
     aliases?: { [index: string]: string[] },
     sitelinks?: { [index: string]: string },
     claims?: { [index: string]: any[] },
-};
+}
 
 export function simplifyEntity(data: any, options: SimplifyEntityOptionsType
     = { labels: true, descriptions: true, aliases: true, sitelinks: true, claims: true }): SimpleEntityType {
@@ -32,6 +32,8 @@ export function simplifyEntity(data: any, options: SimplifyEntityOptionsType
             entity[key] = data[key];
         }
     });
+
+    delete entity['title'];
 
     if (options.labels !== false && data.labels) {
         entity.labels = simplifyLabels(data.labels);
