@@ -16,6 +16,7 @@ describe('wikidata', function () {
             languages: ['ro', 'en', 'ru']
         })
             .then(function (entities) {
+                assert.equal(1, entities.length);
                 // console.log(entities);
             });
     });
@@ -25,12 +26,12 @@ describe('wikidata', function () {
 
         return findTitles.findTitles('r. moldova', 'ro', { limit: 4 })
             .then(function (titles) {
-                console.log('titles', titles);
                 titles = utils._.map(titles, 'title');
                 return findEntities.findEntities({ titles: titles, languages: ['ro', 'en', 'ru'], sites: ['rowiki'] },
                     { simplify: { claims: true }, claims: { languages: ['ro', 'en', 'ru'], sites: ['enwiki'], props: ['info', 'labels', 'aliases', 'datatype', 'descriptions'] } })
                     .then(function (entities) {
-                        console.log(JSON.stringify(entities[0]));
+                        assert.equal(1, entities.length);
+                        // console.log(JSON.stringify(entities[0]));
                     });
             });
     });

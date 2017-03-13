@@ -2,9 +2,10 @@
 
 const debug = require('debug')('entity-finder');
 
-import { _, Promise, PageType } from './utils';
+import { _, Promise } from './utils';
 import * as wiki from './wikipedia';
 import { findTitles, FindTitleOptionsType } from './find_titles';
+import { PageType } from './types';
 
 export type EntityType = {
 	name: string,

@@ -5,21 +5,18 @@ const wikiData = require('wikipedia-data');
 
 import * as utils from './utils';
 import * as wiki from './wikipedia';
+import { PageTitleType } from './types';
 
 export type FindTitleOptionsType = {
 	limit?: number,
 	tags?: string[],
 	profile?: string
-};
+}
 
-const OPTIONS: FindTitleOptionsType = {
-	limit: 2
-};
-
-export function findTitles(name: string, lang: string, options?: FindTitleOptionsType): Promise<utils.PageTitleType[]> {
+export function findTitles(name: string, lang: string, options: FindTitleOptionsType = { limit: 2 }): Promise<PageTitleType[]> {
 	name = name.split('|')[0];
 
-	options = utils._.defaults({}, options, OPTIONS);
+	options.limit = options.limit || 2;
 
 	const limit = options.limit;
 	let tags: RegExp[];
@@ -44,7 +41,7 @@ export function findTitles(name: string, lang: string, options?: FindTitleOption
 			}
 			return list;
 		})
-		.then(function (list: utils.PageTitleType[]) {
+		.then(function (list: PageTitleType[]) {
 			debug('unfiltered titles', list);
 			let titles = [];
 			for (let i = 0; i < list.length; i++) {
@@ -125,7 +122,7 @@ function isComplex(name: string, title) {
 	return false;
 }
 
-function orderByTags(list, tags?: RegExp[]): utils.PageTitleType[] {
+function orderByTags(list, tags?: RegExp[]): PageTitleType[] {
 	// if (list.length > 1 && tags && tags.length > 0) {
 	debug('Unordered by tags', utils._.map(list, 'title'));
 	const sortList = list.filter((item, i) => {

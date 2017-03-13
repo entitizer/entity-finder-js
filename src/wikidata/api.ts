@@ -2,6 +2,7 @@
 
 import { _, Promise } from '../utils';
 import request from '../request';
+import {WikidataEntityType} from '../types';
 
 const API_URL = 'https://www.wikidata.org/w/api.php';
 
@@ -25,14 +26,15 @@ export type SearchEntitiesParamsType = {
     format?: string
 };
 
-export type SearchEntity = {
+export type WikidataSearchEntityType = {
     id: string;
-    label: string;
+    label?: string;
     pageid?: number;
     description?: string;
+    aliases?: string[]
 };
 
-export function getEntities(params: GetEntitiesParamsType): Promise<any[]> {
+export function getEntities(params: GetEntitiesParamsType): Promise<WikidataEntityType[]> {
     const qs = {
         action: 'wbgetentities',
         ids: getStringArrayParam(params.ids),
@@ -55,6 +57,9 @@ export function getEntities(params: GetEntitiesParamsType): Promise<any[]> {
 
     return request({ qs: qs, url: API_URL })
         .then(data => {
+            if (hasError(data)) {
+                return Promise.reject(getError(data));
+            }
             if (data && data.entities) {
                 return Object.keys(data.entities).map(id => data.entities[id]);
             }
@@ -62,7 +67,7 @@ export function getEntities(params: GetEntitiesParamsType): Promise<any[]> {
         });
 };
 
-export function searchEntities(params: SearchEntitiesParamsType): Promise<any[]> {
+export function searchEntities(params: SearchEntitiesParamsType): Promise<WikidataSearchEntityType[]> {
     const qs = {
         action: 'wbsearchentities',
         search: params.search,
@@ -75,6 +80,9 @@ export function searchEntities(params: SearchEntitiesParamsType): Promise<any[]>
 
     return request({ qs: qs, url: API_URL })
         .then(data => {
+            if (hasError(data)) {
+                return Promise.reject(getError(data));
+            }
             if (data && data.search) {
                 return data.search;
             }
@@ -82,6 +90,13 @@ export function searchEntities(params: SearchEntitiesParamsType): Promise<any[]>
         });
 };
 
+function getError(data: any): Error {
+    return data && data.error && new Error(data.error.info || 'Wikidata Api Error') || new Error('NO error');
+}
+
+function hasError(data: any): boolean {
+    return !!data.error;
+}
 
 function getStringArrayParam(value: string[] | string, def: string = null) {
     if (!value || value.length === 0) {

@@ -1,7 +1,8 @@
 
 import { query as apiQuery } from './api';
 import { normalize as pageNormalize } from './page_normalize';
-import { PageType, Promise } from '../utils';
+import { Promise } from '../utils';
+import { PageType } from '../types';
 
 export function query(lang: string, refName: string, refValue: string, qs?: any): Promise<PageType[]> {
 	qs = qs || {

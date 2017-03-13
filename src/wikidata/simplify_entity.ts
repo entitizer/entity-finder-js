@@ -1,5 +1,6 @@
 
 import { OptionsType as SimplifyClaimsOptionsType, simplifyClaims } from './simplify_claims';
+import { WikidataEntityType, WikidataSimpleEntityType } from '../types';
 import { _ } from '../utils';
 
 export type SimplifyEntityOptionsType = {
@@ -10,30 +11,15 @@ export type SimplifyEntityOptionsType = {
     claims?: boolean | SimplifyClaimsOptionsType;
 }
 
-export type SimpleEntityType = {
-    id: string;
-    pageid?: number;
-    lastrevid?: number;
-    modified?: string;
-    labels?: { [index: string]: string },
-    descriptions?: { [index: string]: string },
-    aliases?: { [index: string]: string[] },
-    sitelinks?: { [index: string]: string },
-    claims?: { [index: string]: any[] },
-}
+export function simplifyEntity(data: WikidataEntityType, options: SimplifyEntityOptionsType = {}): WikidataSimpleEntityType {
 
-export function simplifyEntity(data: any, options: SimplifyEntityOptionsType
-    = { labels: true, descriptions: true, aliases: true, sitelinks: true, claims: true }): SimpleEntityType {
-
-    const entity: SimpleEntityType = { id: data.id };
+    const entity: WikidataSimpleEntityType = { id: data.id, type: data.type };
 
     Object.keys(data).forEach(key => {
         if (data[key] !== undefined && data[key] !== null) {
             entity[key] = data[key];
         }
     });
-
-    delete entity['title'];
 
     if (options.labels !== false && data.labels) {
         entity.labels = simplifyLabels(data.labels);

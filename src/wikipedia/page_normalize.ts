@@ -1,6 +1,7 @@
 
 const wikiData = require('wikipedia-data');
-import { PageType, formatTitle } from '../utils';
+import { formatTitle } from '../utils';
+import { PageType } from '../types';
 
 function fixLanglinks(page) {
 	page.langlinks = page.langlinks || [];

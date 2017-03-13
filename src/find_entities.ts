@@ -1,42 +1,48 @@
 
 import { getEntities, GetEntitiesParamsType } from './wikidata/api';
-import { simplifyEntity, SimplifyEntityOptionsType, SimpleEntityType } from './wikidata/simplify_entity';
+import { simplifyEntity, SimplifyEntityOptionsType } from './wikidata/simplify_entity';
 import { isWikidataId, Promise } from './utils';
+import { WikidataEntityType, WikidataSimpleEntityType, WikidataEntityClaimsType } from './types';
+
+export { getEntities, GetEntitiesParamsType };
 
 export type FindEntitiesOptionsType = {
     simplify?: boolean | SimplifyEntityOptionsType,
     claims?: GetEntitiesParamsType
 };
 
-export function findEntities(params: GetEntitiesParamsType, options: FindEntitiesOptionsType = {}): Promise<SimpleEntityType[]> {
+export function findEntities<T extends WikidataEntityType | WikidataSimpleEntityType>(params: GetEntitiesParamsType, options: FindEntitiesOptionsType = {}): Promise<WikidataEntityType[] | WikidataSimpleEntityType[]> {
 
     return getEntities(params).then(function (entities) {
         if (!entities || entities.length < 1) {
             return entities;
         }
 
-        entities = entities.filter(filterDezambiguisation);
+        entities = entities.filter(filterEntity);
 
         if (entities.length < 1) {
             return entities;
         }
 
         if (options.simplify !== false) {
-            entities = entities.map(entity => simplifyEntity(entity, options.simplify));
+            const simpleEntities = entities.map(entity => simplifyEntity(entity, options.simplify));
             if (options.claims === true || typeof options.claims === 'object') {
-                return Promise.map(entities, entity => findClaimsEntities(entity, options.claims));
+                return Promise.map(simpleEntities, entity => findEntityClaims(entity, options.claims));
             }
+            return simpleEntities;
         }
 
         return entities;
     });
 }
 
-function findClaimsEntities(entity: SimpleEntityType, options?: GetEntitiesParamsType): Promise<SimpleEntityType> {
-    if (!entity || !entity.claims) {
+export function findEntityClaims(entity: WikidataSimpleEntityType, options?: GetEntitiesParamsType): Promise<WikidataSimpleEntityType> {
+    const claims = entity.claims;
+
+    if (!claims) {
         return Promise.resolve(entity);
     }
-    const claims = entity.claims;
+
     const ids = [];
     const paths = {};// id=[key:position]
     Object.keys(claims).forEach(property => {
@@ -51,10 +57,6 @@ function findClaimsEntities(entity: SimpleEntityType, options?: GetEntitiesParam
             }
         });
     });
-
-    // console.log('ids', ids);
-    // console.log('paths', paths);
-    // console.log('claims', claims);
 
     if (ids.length === 0) {
         return Promise.resolve(entity);
@@ -102,13 +104,13 @@ function findClaimsEntities(entity: SimpleEntityType, options?: GetEntitiesParam
  * Filter entities thar are instances of disambiguation page.
  * @param entity Entity to test
  */
-function filterDezambiguisation(entity: any): boolean {
+export function filterEntity(entity: WikidataSimpleEntityType | WikidataEntityType): boolean {
     const disambiguationPageId = 'Q4167410';
     if (entity && entity.claims && entity.claims.P31) {
         const instanceOf = entity.claims.P31;
         for (var i = 0; i < instanceOf.length; i++) {
             var value = instanceOf[i];
-            if (value === disambiguationPageId || value.mainsnak && value.mainsnak.datavalue && value.mainsnak.datavalue.value && value.mainsnak.datavalue.value.id === disambiguationPageId) {
+            if (value.value === disambiguationPageId || value.mainsnak && value.mainsnak.datavalue && value.mainsnak.datavalue.value && value.mainsnak.datavalue.value.id === disambiguationPageId) {
                 return false;
             }
         }
