@@ -9,7 +9,7 @@ import { PageTitleType } from './types';
 
 export type FindTitleOptionsType = {
 	limit?: number,
-	tags?: string[],
+	tags?: string[] | string,
 	profile?: string
 }
 
@@ -19,6 +19,9 @@ export function findTitles(name: string, lang: string, options: FindTitleOptions
 	const limit = options.limit || 2;
 	let tags: RegExp[];
 	if (options.tags) {
+		if (!Array.isArray(options.tags)) {
+			options.tags = [options.tags];
+		}
 		tags = options.tags.map((tag) => {
 			return new RegExp('(^|\\b)' + tag + '(\\b|$)', 'gi');
 		});

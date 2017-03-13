@@ -3,7 +3,7 @@
 const debug = require('debug')('entity-finder');
 
 import { _, Promise } from './utils';
-import { WikidataSimpleEntityType } from './types';
+import { WikidataSimpleEntityType, EntityType } from './types';
 import * as finder from './finder';
 
 export * from './types';
@@ -13,13 +13,14 @@ export type FindOptions = {
 	limit?: number,
 	languages?: string[],
 	claims?: boolean,
-	props?: string[]
+	props?: string[],
+	tags?: string[]
 }
 
-export function find(name: string, lang: string, options: FindOptions = {}): Promise<WikidataSimpleEntityType[]> {
+export function find(name: string, lang: string, options: FindOptions = {}): Promise<EntityType[]> {
 	const limit = options.limit || 2;
 
-	return finder.findTitles(name, lang, { limit: limit })
+	return finder.findTitles(name, lang, { limit: limit, tags: options.tags })
 		.then(function (foundTitles) {
 			if (foundTitles.length === 0) {
 				return [];
@@ -32,7 +33,7 @@ export function find(name: string, lang: string, options: FindOptions = {}): Pro
 				titles: titles,
 				languages: languages,
 				props: options.props
-			}, { claims: options.claims, simplify: true });
+			}, { claims: options.claims });
 		});
 
 }

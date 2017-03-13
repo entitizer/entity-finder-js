@@ -51,3 +51,22 @@ export interface WikidataSimpleEntityType extends WikidataBaseEntity {
     claims?: WikidataEntityClaimsType;
     sitelinks?: IIndexType<string>;
 }
+
+export type EntityTypeType = 'place' | 'person' | 'org';
+
+export type EntityType = {
+    id: string;
+
+    pageid?: number;
+    lastrevid?: number;
+    modified?: string;
+
+    labels?: IIndexType<string>;
+    descriptions?: IIndexType<string>;
+    aliases?: IIndexType<string[]>;
+    claims?: WikidataEntityClaimsType;
+    sitelinks?: IIndexType<string>;
+
+    type?: EntityTypeType;
+
+};

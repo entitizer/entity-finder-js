@@ -2,17 +2,18 @@
 import { getEntities, GetEntitiesParamsType } from './wikidata/api';
 import { simplifyEntity, SimplifyEntityOptionsType } from './wikidata/simplify_entity';
 import { isWikidataId, Promise } from './utils';
-import { WikidataEntityType, WikidataSimpleEntityType, WikidataEntityClaimsType } from './types';
+import { WikidataEntityType, WikidataSimpleEntityType, WikidataEntityClaimsType, EntityType } from './types';
+import { entitify } from './entitify';
 
 export { findTitles, FindTitleOptionsType } from './find_titles';
 export { getEntities, GetEntitiesParamsType };
 
 export type FindEntitiesOptionsType = {
-    simplify?: boolean | SimplifyEntityOptionsType,
+    // simplify?: boolean | SimplifyEntityOptionsType,
     claims?: GetEntitiesParamsType
 };
 
-export function findEntities<T extends WikidataEntityType | WikidataSimpleEntityType>(params: GetEntitiesParamsType, options: FindEntitiesOptionsType = {}): Promise<WikidataEntityType[] | WikidataSimpleEntityType[]> {
+export function findEntities(params: GetEntitiesParamsType, options: FindEntitiesOptionsType = {}): Promise<EntityType[]> {
 
     return getEntities(params).then(function (entities) {
         if (!entities || entities.length < 1) {
@@ -25,15 +26,16 @@ export function findEntities<T extends WikidataEntityType | WikidataSimpleEntity
             return entities;
         }
 
-        if (options.simplify !== false) {
-            const simpleEntities = entities.map(entity => simplifyEntity(entity, options.simplify));
-            if (options.claims === true || typeof options.claims === 'object') {
-                return Promise.map(simpleEntities, entity => findEntityClaims(entity, options.claims));
-            }
-            return simpleEntities;
+        // if (options.simplify !== false) {
+        const simpleEntities = entities.map(simplifyEntity);
+        if (options.claims === true || typeof options.claims === 'object') {
+            return Promise.map(simpleEntities, entity => findEntityClaims(entity, options.claims))
+                .then(entitifyEntities);
         }
+        return entitifyEntities(simpleEntities);
+        // }
 
-        return entities;
+        // return entitifyEntities(entities);
     });
 }
 
@@ -105,9 +107,18 @@ export function findEntityClaims(entity: WikidataSimpleEntityType, options?: Get
  * Filter entities thar are instances of disambiguation page.
  * @param entity Entity to test
  */
-export function filterEntity(entity: WikidataSimpleEntityType | WikidataEntityType): boolean {
+export function filterEntity(entity: any): boolean {
+    if (!entity) {
+        return false;
+    }
+
     const disambiguationPageId = 'Q4167410';
-    if (entity && entity.claims && entity.claims.P31) {
+    const disambiguationPageDescription = 'Wikimedia disambiguation page';
+
+    if (entity.descriptions && entity.descriptions['en'] && (entity.descriptions['en'] === disambiguationPageDescription || entity.descriptions['en'].value === disambiguationPageDescription)) {
+        return false;
+    }
+    if (entity.claims && entity.claims.P31) {
         const instanceOf = entity.claims.P31;
         for (var i = 0; i < instanceOf.length; i++) {
             var value = instanceOf[i];
@@ -118,4 +129,8 @@ export function filterEntity(entity: WikidataSimpleEntityType | WikidataEntityTy
     }
 
     return true;
+}
+
+function entitifyEntities(entities: WikidataSimpleEntityType[]): EntityType[] {
+    return entities.map(entitify);
 }
