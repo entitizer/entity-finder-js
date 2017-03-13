@@ -11,22 +11,6 @@ export type PageTitleType = {
     isDisambiguation?: boolean
 };
 
-export type PageType = {
-    title: string,
-    pageid?: number,
-    simpleTitle?: string,
-    specialTitle?: string,
-    extract?: string,
-    simple?: string,
-    special?: string,
-    pagelanguage?: string,
-    isDisambiguation?: boolean,
-    categories?: { title: string }[],
-    format?: string,
-    templates?: { title: string }[],
-    type?: string
-};
-
 export type LanguageValueType<T> = {
     language: string;
     value: T;

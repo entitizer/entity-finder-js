@@ -4,7 +4,7 @@ const debug = require('debug')('entity-finder');
 const wikiData = require('wikipedia-data');
 
 import * as utils from './utils';
-import * as wiki from './wikipedia';
+import * as wikiApi from './wikipedia/api';
 import { PageTitleType } from './types';
 
 export type FindTitleOptionsType = {
@@ -27,11 +27,11 @@ export function findTitles(name: string, lang: string, options: FindTitleOptions
 	}
 
 	const wordsCount = utils.countWords(name);
-	return wiki.api.openSearch(lang, name, { profile: options.profile, limit: limit + 2 })
+	return wikiApi.openSearch(lang, name, { profile: options.profile, limit: limit + 2 })
 		.then(function (result) {
 			const list = [];
 			for (let i = 0; i < result[1].length; i++) {
-				const title = utils.formatTitle(result[1][i]);
+				const title = formatTitle(result[1][i]);
 				title.description = result[2][i];
 				list.push(title);
 			}
@@ -80,6 +80,20 @@ export function findTitles(name: string, lang: string, options: FindTitleOptions
 			debug('filterd titles', titles);
 			return titles;
 		});
+}
+
+
+function formatTitle(title: string): PageTitleType {
+	var result = /\(([^)]+)\)$/i.exec(title);
+	const pageTitle: PageTitleType = {
+		title: title
+	};
+	if (result) {
+		pageTitle.simple = pageTitle.title.substr(0, result.index).trim();
+		pageTitle.special = result[1];
+	}
+
+	return pageTitle;
 }
 
 function getDisambiguationNames(lang) {
