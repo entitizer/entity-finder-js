@@ -4,6 +4,7 @@ import { simplifyEntity, SimplifyEntityOptionsType } from './wikidata/simplify_e
 import { isWikidataId, Promise } from './utils';
 import { WikidataEntityType, WikidataSimpleEntityType, WikidataEntityClaimsType } from './types';
 
+export { findTitles, FindTitleOptionsType } from './find_titles';
 export { getEntities, GetEntitiesParamsType };
 
 export type FindEntitiesOptionsType = {

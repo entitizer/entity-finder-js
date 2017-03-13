@@ -13,12 +13,10 @@ export type FindTitleOptionsType = {
 	profile?: string
 }
 
-export function findTitles(name: string, lang: string, options: FindTitleOptionsType = { limit: 2 }): Promise<PageTitleType[]> {
+export function findTitles(name: string, lang: string, options: FindTitleOptionsType = {}): Promise<PageTitleType[]> {
 	name = name.split('|')[0];
 
-	options.limit = options.limit || 2;
-
-	const limit = options.limit;
+	const limit = options.limit || 2;
 	let tags: RegExp[];
 	if (options.tags) {
 		tags = options.tags.map((tag) => {
