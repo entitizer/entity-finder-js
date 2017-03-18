@@ -83,7 +83,6 @@ export function findTitles(name: string, lang: string, options: FindTitleOptions
 		});
 }
 
-
 function formatTitle(title: string): PageTitleType {
 	var result = /\(([^)]+)\)$/i.exec(title);
 	const pageTitle: PageTitleType = {
@@ -110,12 +109,12 @@ function filterOneWordName(name: string, title: string) {
 }
 
 function isAbbr(name: string, title: string) {
-	if (name === name.toUpperCase()) {
-		const words = title.split(/[\s-]+/g);
-		if (words.length >= name.length) {
-			return true;
-		}
+	// if (name === name.toUpperCase()) {
+	const words = title.split(/[\s-]+/g);
+	if (words.length >= name.length) {
+		return true;
 	}
+	// }
 
 	return false;
 }

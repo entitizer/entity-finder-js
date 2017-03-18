@@ -3,37 +3,36 @@
 const debug = require('debug')('entity-finder');
 
 import { _, Promise } from './utils';
-import { WikidataSimpleEntityType, EntityType } from './types';
-import * as finder from './finder';
-
-export * from './types';
-export * from './finder';
+import { WikiEntitiesParams, getEntities, WikiEntity, ParamClaimsType } from 'wiki-entity';
+import { findTitles, FindTitleOptionsType } from './find_titles';
+import { filterWikiEntities } from './filters';
 
 export type FindOptions = {
-	limit?: number,
-	languages?: string[],
-	claims?: boolean,
-	props?: string[],
-	tags?: string[]
+	limit?: number;
+	tags?: string[];
+	claims?: ParamClaimsType;
+	extract?: number;
 }
 
-export function find(name: string, lang: string, options: FindOptions = {}): Promise<EntityType[]> {
+export function find(name: string, lang: string, options: FindOptions = {}): Promise<WikiEntity[]> {
 	const limit = options.limit || 2;
 
-	return finder.findTitles(name, lang, { limit: limit, tags: options.tags })
+	return findTitles(name, lang, { limit: limit + 2, tags: options.tags })
 		.then(function (foundTitles) {
 			if (foundTitles.length === 0) {
 				return [];
 			}
 
 			const titles = foundTitles.map(title => title.title);
-			const languages = options.languages || [lang];
+			debug('finding titles', titles);
 
-			return finder.findEntities({
-				titles: titles,
-				languages: languages,
-				props: options.props
-			}, { claims: options.claims });
+			return getEntities({
+				titles: titles.join('|'),
+				language: lang,
+				claims: options.claims,
+				extract: options.extract
+			})
+				.then(filterWikiEntities)
+				.then(entities => entities.slice(0, limit));
 		});
-
 }

@@ -4,7 +4,7 @@ const request = require('request');
 
 import { _, Promise } from './utils';
 
-export default function (options: any): Promise<any> {
+export default function <T>(options: any): Promise<T> {
 	options = _.defaults(options, {
 		method: 'GET',
 		json: true,
