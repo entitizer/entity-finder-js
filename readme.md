@@ -12,11 +12,11 @@ Finds entities. Returns an array of entities ordered by relevance.
 - **lang** (String), required - Language 2 chars code: `en`.
 - **options** (Object), optional - Options object:
   - **limit** (Number) - Maxim number of entities to return. Default: 2.
+  - **tags** ([String]) (null) - Order results by tags score.
   - **claims** (String) - How to resolve the claims. Can be: `none`, `all`, `item`, `property`. Default: `none`. `all` resolves `item` and `property` types.
   - **extract** (Number) - Sentences in the extract. Default: `0`.
-  - **tags** ([String]) (null) - Order results by tags score.
-
-
+  - **types** :*boolean* | *string*[] - `true` to get entity types. Filter types by [prefixes](https://dbpedia.org/sparql?nsdecl). Example: [`dbo`, `schema`] will return only types defined by `dbpedia.org/ontology/` and `schema.org`. Default: `false`.
+  - **redirects** ([Boolean]) (false) - Get wikipedia redirect titles.
 
 
 ## Changelog

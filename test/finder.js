@@ -50,7 +50,7 @@ describe('finder', function () {
 			return finder.find('Adrian Ursu cântăreț', 'ro')
 				.then(function (entities) {
 					// console.log('Adrian Ursu entities', entities);
-					assert.equal(0, entities.length);
+					assert.equal(1, entities.length);
 					// assert.equal('cântăreț', entities[0].wikiPage.specialTitle);
 					// assert.equal('person', entities[0].type);
 				});

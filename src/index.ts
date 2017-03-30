@@ -7,11 +7,15 @@ import { WikiEntitiesParams, getEntities, WikiEntity, ParamClaimsType } from 'wi
 import { findTitles, FindTitleOptionsType } from './find_titles';
 import { filterWikiEntities } from './filters';
 
+export { ParamClaimsType, WikiEntity }
+
 export type FindOptions = {
 	limit?: number;
 	tags?: string[];
 	claims?: ParamClaimsType;
 	extract?: number;
+	redirects?: boolean,
+	types?: boolean | string[]
 }
 
 export function find(name: string, lang: string, options: FindOptions = {}): Promise<WikiEntity[]> {
@@ -30,7 +34,9 @@ export function find(name: string, lang: string, options: FindOptions = {}): Pro
 				titles: titles.join('|'),
 				language: lang,
 				claims: options.claims,
-				extract: options.extract
+				extract: options.extract,
+				redirects: options.redirects,
+				types: options.types
 			})
 				.then(filterWikiEntities)
 				.then(entities => entities.slice(0, limit));
