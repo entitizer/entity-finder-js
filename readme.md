@@ -2,7 +2,7 @@
 
 A nodejs entity finder. **entity-finder** that searchs the wikipedia for titles and returns the most correct answers.
 
-It will omit any wikipedia dezambiguization pages.
+It will omit any wikipedia disambiguization pages.
 
 ## Usage
 
