@@ -1,10 +1,34 @@
 # entity-finder
 
-A nodejs Named entity finder. **entity-finder** will search the internet(wikipedia, ...) for an entity and return the most correct answers.
+A nodejs entity finder. **entity-finder** that searchs the wikipedia for titles and returns the most correct answers.
+
+It will omit any wikipedia dezambiguization pages.
+
+## Usage
+
+```js
+import { findTitles } from 'entity-finder';
+
+const name = 'democratic party';
+const lang = 'en';
+const titles = await findTitles(name, lang, { limit: 1, tags: 'thailand' });
+const title = titles[0]:
+// title =
+// { 
+//   title: 'Democrat Party (Thailand)',
+//   simple: 'Democrat Party',
+//   special: 'Thailand',
+//   description: 'The Democrat Party (Thai: พรรคประชาธิปัตย์; RTGS: prachathipat) is a Thai political party...',
+//   categories:
+//     [ 'Category:1946 establishments in Thailand',
+//       'Category:Classical liberal parties' ]
+// }
+
+```
 
 ## API
 
-### find(name, lang, options)
+### findTitles(name: string, lang: string, options?): Promise<PageTitle[]>
 
 Finds entities. Returns an array of entities ordered by relevance.
 
@@ -13,13 +37,27 @@ Finds entities. Returns an array of entities ordered by relevance.
 - **options** (Object), optional - Options object:
   - **limit** (Number) - Maxim number of entities to return. Default: 2.
   - **tags** ([String]) (null) - Order results by tags score.
-  - **claims** (String) - How to resolve the claims. Can be: `none`, `all`, `item`, `property`. Default: `none`. `all` resolves `item` and `property` types.
-  - **extract** (Number) - Sentences in the extract. Default: `0`.
-  - **types** :*boolean* | *string*[] - `true` to get entity types. Filter types by [prefixes](https://dbpedia.org/sparql?nsdecl). Example: [`dbo`, `schema`] will return only types defined by `dbpedia.org/ontology/` and `schema.org`. Default: `false`.
-  - **redirects** ([Boolean]) (false) - Get wikipedia redirect titles.
 
+#### PageTitle
+
+```ts
+export type PageTitle = {
+  title: string
+  simple?: string
+  special?: string
+  description?: string
+  categories?: string[]
+}
+```
 
 ## Changelog
+
+### v0.5.0 - Match 17, 2018
+
+- search only for titles
+- updated API
+- filters dezambiguization titles (Category:Dezambiguization)
+- updated `options` param
 
 ### v0.4.0 - Match 18, 2017
 

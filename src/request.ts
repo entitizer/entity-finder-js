@@ -1,11 +1,8 @@
-'use strict';
 
 const request = require('request');
 
-import { _, Promise } from './utils';
-
 export default function <T>(options: any): Promise<T> {
-	options = _.defaults(options, {
+	options = Object.assign({}, options, {
 		method: 'GET',
 		json: true,
 		encoding: 'utf8',
@@ -24,11 +21,11 @@ export default function <T>(options: any): Promise<T> {
 	}
 
 	return new Promise(function (resolve, reject) {
-		request(options, function (error, response, body) {
+		request(options, function (error: Error, _response: any, body: any) {
 			if (error) {
 				return reject(error);
 			}
 			resolve(body);
 		});
 	});
-};
+}

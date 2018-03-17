@@ -1,34 +1,37 @@
 {
   "name": "entity-finder",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Named entity finder",
   "main": "./lib/index.js",
   "types": "./types/index.d.ts",
   "scripts": {
-    "pretest": "npm run tsc",
-    "test": "mocha -t 10000",
+    "pretest": "npm run clean && npm run tsc",
+    "test": "ava --no-cache --verbose lib/**/*.test.js",
+    "posttest": "npm run clean-test-code",
     "tsc": "tsc",
     "tscw": "tsc -w",
     "preversion": "npm run tsc",
     "postversion": "git push --follow-tags",
-    "prepublish": "npm run tsc"
+    "prepublishOnly": "npm run tsc && npm run clean-test-code",
+    "clean": "rimraf ./lib && rimraf ./types",
+    "clean-test-code": "rimraf ./lib/**/*.test.js && rimraf ./types/**/*.test.d.ts",
+    "find": "node ./run.js"
   },
   "engines": {
     "node": ">=4.0.0"
   },
   "dependencies": {
-    "bluebird": "^3.0.6",
-    "debug": "^2.2.0",
-    "lodash": "^4.17.4",
-    "request": "^2.72.0",
+    "atonic": "^1.0.4",
+    "request": "^2.85.0",
     "wiki-entity": "^0.1.3",
-    "wikipedia-data": "^0.1.0"
+    "wikipedia-data": "^0.1.1"
   },
   "devDependencies": {
-    "@types/bluebird": "^3.0.37",
-    "@types/node": "7.0.5",
-    "mocha": "^3.2.0",
-    "typescript": "^2.2.1"
+    "@types/node": "latest",
+    "ava": "^0.23.0",
+    "debug": "^3.1.0",
+    "rimraf": "^2.6.2",
+    "typescript": "latest"
   },
   "repository": {
     "type": "git",

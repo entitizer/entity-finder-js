@@ -14,8 +14,9 @@ if (name[0] === '"') {
 	name = name.substr(0, name.length - 1);
 }
 
-console.log('name', name);
+console.log('Finding for', name);
 
-return finder.find(name, lang, options).then(function(entities) {
-	console.log(entities);
-});
+finder.findTitles(name, lang, options)
+	.then(function (titles) {
+		console.log(titles.map(item => item.title));
+	});

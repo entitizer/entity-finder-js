@@ -1,6 +1,5 @@
 'use strict';
 
-import { _, Promise } from '../utils';
 import request from '../request';
 
 const OPTIONS = {
@@ -12,9 +11,9 @@ const OPTIONS = {
 /**
  * Create request options: url, qs, headers
  */
-function createOptions(lang, qs) {
+function createOptions(lang: string, qs: any): any {
 	const options = {
-		qs: _.defaults({}, qs || {}, OPTIONS.qs),
+		qs: Object.assign({}, qs || {}, OPTIONS.qs),
 		url: 'https://' + lang + '.wikipedia.org/w/api.php'
 	};
 
@@ -27,9 +26,12 @@ export function query(lang: string, qs?: any): Promise<any> {
 	const options = createOptions(lang, qs);
 
 	return request(options);
-};
+}
 
-export function openSearch(lang: string, search: string, opts: { redirects?: string, limit?: number, profile?: string } = {}) {
+export function openSearch(lang: string, search: string,
+	opts: { redirects?: string, limit?: number, profile?: string }): any {
+	opts = opts || {};
+
 	const qs = {
 		search: search,
 		action: 'opensearch',
@@ -42,9 +44,9 @@ export function openSearch(lang: string, search: string, opts: { redirects?: str
 	const options = createOptions(lang, qs);
 
 	return request(options);
-};
+}
 
-export function search(lang: string, srsearch: string) {
+export function search(lang: string, srsearch: string): any {
 	const qs = {
 		srsearch: srsearch,
 		list: 'search',
@@ -52,4 +54,4 @@ export function search(lang: string, srsearch: string) {
 	};
 
 	return query(lang, qs);
-};
+}

@@ -3,14 +3,21 @@
         "module": "commonjs",
         "outDir": "lib",
         "rootDir": "./src",
-        "target": "es5",
-        "noImplicitAny": false,
+        "target": "es6",
+        "noImplicitAny": true,
         "removeComments": true,
         "preserveConstEnums": true,
         "sourceMap": false,
         "moduleResolution": "node",
         "declaration": true,
-        "declarationDir": "types"
+        "declarationDir": "types",
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "allowJs": false
+    },
+    "formatCodeOptions": {
+        "indentSize": 2,
+        "tabSize": 2
     },
     "include": [
         "src/**/*.ts"
