@@ -37,6 +37,7 @@ Finds entities. Returns an array of entities ordered by relevance.
 - **options** (Object), optional - Options object:
   - **limit** (Number) - Maxim number of entities to return. Default: 2.
   - **tags** ([String]) (null) - Order results by tags score.
+  - **orderByTagsLimit** (Number) - Limit titles ordered by tags.
 
 #### PageTitle
 
@@ -51,6 +52,10 @@ export type PageTitle = {
 ```
 
 ## Changelog
+
+### v0.5.1 - Match 21, 2018
+
+- New option: `orderByTagsLimit` - Limits titles ordered by tags.
 
 ### v0.5.0 - Match 17, 2018
 

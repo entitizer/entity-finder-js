@@ -9,6 +9,7 @@ import { PageTitle } from './types';
 export interface SearchTitleOptions {
     limit?: number
     tags?: string[] | string
+    orderByTagsLimit?: number
 }
 
 export function searchTitles(name: string, lang: string, options: SearchTitleOptions)
@@ -19,7 +20,8 @@ export function searchTitles(name: string, lang: string, options: SearchTitleOpt
     name = name.trim();
 
     const limit = options.limit || 2;
-    const openSearchOptions = { limit: limit };
+    const openSearchOptions = { limit: limit + 5 };
+    const orderByTagsLimit = options.orderByTagsLimit || limit;
 
     return wikiApi.openSearch(lang, name, openSearchOptions)
         .then((result: any) => {
@@ -30,27 +32,13 @@ export function searchTitles(name: string, lang: string, options: SearchTitleOpt
                 list.push(title);
             }
             debug('findTitles', name, lang, limit);
-            return orderByTags(list, options.tags);
+            return orderByTags(list, options.tags, orderByTagsLimit);
         })
         .then((list: PageTitle[]) => {
             debug('unfiltered titles', list);
             let titles = [];
             for (let i = 0; i < list.length; i++) {
                 const title = list[i];
-
-                // if (isAbbr(name, title.simple || title.title)) {
-                //     titles.push(title);
-                //     continue;
-                // }
-
-                // if (isComplex(name, title.simple || title.title)) {
-                //     titles.push(title);
-                //     continue;
-                // }
-
-                // if (!filterOneWordName(name, title.simple || title.title)) {
-                //     continue;
-                // }
 
                 if (title.simple) {
                     const disName = getDisambiguationNames(lang);
@@ -59,12 +47,7 @@ export function searchTitles(name: string, lang: string, options: SearchTitleOpt
                         continue;
                     }
                 }
-                // else {
-                //     const titleWordsCount = utils.countWords(title.title);
-                //     if (titleWordsCount !== wordsCount && !startsWith(title.title, name) && !containsWords(title.title, name)) {
-                //         continue;
-                //     }
-                // }
+
                 titles.push(title);
             }
 
@@ -91,7 +74,7 @@ function getDisambiguationNames(lang: string): string {
     return wikiData.getDisambiguationNames2()[lang];
 }
 
-function orderByTags(list: any[], tags: string | string[]): PageTitle[] {
+function orderByTags(list: any[], tags: string | string[], orderByTagsLimit: number): PageTitle[] {
     if (!tags) {
         return list;
     }
@@ -103,7 +86,7 @@ function orderByTags(list: any[], tags: string | string[]): PageTitle[] {
 
     // if (list.length > 1 && tags && tags.length > 0) {
     debug('Unordered by tags', list.map(item => item.title), tags);
-    const selectedList = list.filter((item) => {
+    const selectedList = list.filter((item, i) => {
         let score = 0;
         regTags.forEach((tag) => {
             if (tag.test(item.title)) {
@@ -115,6 +98,7 @@ function orderByTags(list: any[], tags: string | string[]): PageTitle[] {
         });
         item.tempScore = score;
         if (score !== 0) {
+            item.tempScore += list.length - i;
             return true;
         }
         return false;
@@ -125,7 +109,8 @@ function orderByTags(list: any[], tags: string | string[]): PageTitle[] {
         .map(item => {
             delete item.tempScore;
             return item;
-        });
+        })
+        .filter((_item, i) => i < orderByTagsLimit);
 
     if (selectedList.length) {
         list = list.filter(item => !selectedList.find(it => it.title === item.title));

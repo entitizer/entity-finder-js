@@ -42,3 +42,12 @@ test('should find titles by abbreviation: PLDM', async t => {
     t.is(titles.length, 1, '1 title founded');
     t.is(titles[0].title, 'Partidul Liberal Democrat din Moldova');
 });
+
+test('should limit ordered titles by tags', async t => {
+    const name = 'Moldova';
+    const titles = await searchTitles(name, 'ro', { limit: 10, tags: ['Republica Moldova'], orderByTagsLimit: 1 });
+
+    t.is(titles.length, 10, '10 title founded');
+    t.not(titles[0].title, name);
+    t.is(titles[1].title, name);
+});
