@@ -16,3 +16,10 @@ test('should filter Disambiguation pages', async t => {
     t.true(specialNames.indexOf(titles[1].special) > -1, 'has a special name');
 });
 
+test('ru', async t => {
+    const name = 'ЦК';
+    const titles = await findTitles(name, 'ru', { limit: 10 });
+
+    // console.log(titles)
+    t.is(titles.length, 10, '10 titles founded');
+});

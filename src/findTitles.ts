@@ -23,6 +23,7 @@ export function findTitles(name: string, lang: string, options: FindTitleOptions
 
 	return searchTitles(name, lang, searchOptions)
 		.then(titles => {
+			titles = titles.slice(0, limit + 5);
 			return filterDezambiguizationTitles(titles, lang)
 				.then(filteredTitles =>
 					titles.map(item => filteredTitles.find(it => it.title === item.title)).filter(item => !!item)
@@ -39,7 +40,10 @@ function filterDezambiguizationTitles(pageTitles: PageTitle[], lang: string): Pr
 	const titles = pageTitles.map(item => item.title).join('|');
 
 	return wikiApi.query(lang, { titles: titles, prop: 'categories', clshow: '!hidden', cllimit: 50 })
-		.then(data => {
+		.then<PageTitle[]>(data => {
+			if (!data.query) {
+				return Promise.reject(new Error(JSON.stringify(data)))
+			}
 			data = data.query.pages;
 			const filteredTitles = Object.keys(data)
 				.map<{ pageid: number, title: string, categories: string[] }>(pageId => ({ pageid: data[pageId].pageid, title: data[pageId].title, categories: data[pageId].categories && data[pageId].categories.map((item: any) => item.title) }))
