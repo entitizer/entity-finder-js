@@ -9,7 +9,7 @@ export default function <T>(options: any): Promise<T> {
 		headers: {
 			'User-Agent': 'entity-finder'
 		},
-		timeout: 5 * 1000
+		timeout: options.timeout | 5 * 1000,
 	});
 
 	if (options.qs) {

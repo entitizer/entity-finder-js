@@ -29,7 +29,7 @@ export function query(lang: string, qs?: any): Promise<any> {
 }
 
 export function openSearch(lang: string, search: string,
-	opts: { redirects?: string, limit?: number, profile?: string }): any {
+	opts: { redirects?: string, limit?: number, profile?: string, timeout?: number }): any {
 	opts = opts || {};
 
 	const qs = {
@@ -38,7 +38,8 @@ export function openSearch(lang: string, search: string,
 		redirects: opts.redirects || 'resolve',
 		suggest: true,
 		profile: opts.profile || 'normal',
-		limit: opts.limit || 10
+		limit: opts.limit || 10,
+		timeout: opts.timeout,
 	};
 
 	const options = createOptions(lang, qs);

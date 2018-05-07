@@ -19,7 +19,7 @@ export function findTitles(name: string, lang: string, options: FindTitleOptions
 	lang = lang && lang.trim().toLowerCase() || 'en';
 
 	const limit = options.limit || 2;
-	const searchOptions: SearchTitleOptions = { limit: limit + 50, tags: options.tags };
+	const searchOptions: SearchTitleOptions = { limit: limit + 50, tags: options.tags, timeout: options.timeout };
 
 	return searchTitles(name, lang, searchOptions)
 		.then(titles => {

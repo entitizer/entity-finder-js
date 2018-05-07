@@ -10,6 +10,7 @@ export interface SearchTitleOptions {
     limit?: number
     tags?: string[] | string
     orderByTagsLimit?: number
+    timeout?: number
 }
 
 export function searchTitles(name: string, lang: string, options: SearchTitleOptions)
@@ -20,7 +21,7 @@ export function searchTitles(name: string, lang: string, options: SearchTitleOpt
     name = name.trim();
 
     const limit = options.limit || 2;
-    const openSearchOptions = { limit: limit + 5 };
+    const openSearchOptions = { limit: limit + 5, timeout: options.timeout };
     const orderByTagsLimit = options.orderByTagsLimit || limit;
 
     return wikiApi.openSearch(lang, name, openSearchOptions)
