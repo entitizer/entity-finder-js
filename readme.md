@@ -53,6 +53,12 @@ export type PageTitle = {
 
 ## Changelog
 
+### v0.6.0 - May 31, 2021
+
+- remove `wiki-entity` dependency.
+- remove `request` dependency.
+- sixes
+
 ### v0.5.1 - Match 21, 2018
 
 - New option: `orderByTagsLimit` - Limits titles ordered by tags.
