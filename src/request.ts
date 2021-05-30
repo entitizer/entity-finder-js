@@ -1,31 +1,18 @@
+import axios, { AxiosRequestConfig } from "axios";
 
-const request = require('request');
+export type RequestOptions = AxiosRequestConfig;
 
-export default function <T>(options: any): Promise<T> {
-	options = Object.assign({}, options, {
-		method: 'GET',
-		json: true,
-		encoding: 'utf8',
-		headers: {
-			'User-Agent': 'entity-finder'
-		},
-		timeout: options.timeout | 5 * 1000,
-	});
+export default async function <T>(
+  url: string,
+  options: RequestOptions
+): Promise<T> {
+  const response = await axios(url, {
+    method: "GET",
+    responseType: "json",
+    headers: { "User-Agent": "entity-finder" },
+    timeout: 5 * 1000,
+    ...options
+  });
 
-	if (options.qs) {
-		for (var prop in options.qs) {
-			if (~[null].indexOf(options.qs[prop])) {
-				delete options.qs[prop];
-			}
-		}
-	}
-
-	return new Promise(function (resolve, reject) {
-		request(options, function (error: Error, _response: any, body: any) {
-			if (error) {
-				return reject(error);
-			}
-			resolve(body);
-		});
-	});
+  return response.data;
 }

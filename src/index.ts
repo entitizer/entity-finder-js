@@ -1,2 +1,1 @@
-
-export { findTitles, FindTitleOptions } from './findTitles';
+export { findTitles, FindTitleOptions } from "./findTitles";

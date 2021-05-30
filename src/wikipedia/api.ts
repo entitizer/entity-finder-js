@@ -1,58 +1,90 @@
-'use strict';
+"use strict";
 
-import request from '../request';
+import request, { RequestOptions } from "../request";
 
-const OPTIONS = {
-	qs: {
-		format: 'json'
-	}
+const OPTIONS: RequestOptions = {
+  params: {
+    format: "json"
+  }
 };
 
 /**
  * Create request options: url, qs, headers
  */
 function createOptions(lang: string, qs: any): any {
-	const options = {
-		qs: Object.assign({}, qs || {}, OPTIONS.qs),
-		url: 'https://' + lang + '.wikipedia.org/w/api.php'
-	};
+  const options = {
+    params: Object.assign({}, qs || {}, OPTIONS.params),
+    url: "https://" + lang + ".wikipedia.org/w/api.php"
+  };
 
-	return options;
+  return options;
 }
 
-export function query(lang: string, qs?: any): Promise<any> {
-	qs.action = 'query';
+export function query(lang: string, qs: any = {}): Promise<any> {
+  qs.action = "query";
 
-	const options = createOptions(lang, qs);
+  const { url, ...options } = createOptions(lang, qs);
 
-	return request(options);
+  return request(url, options);
 }
 
-export function openSearch(lang: string, search: string,
-	opts: { redirects?: string, limit?: number, profile?: string, timeout?: number }): any {
-	opts = opts || {};
+export function openSearch(
+  lang: string,
+  search: string,
+  opts: {
+    redirects?: string;
+    limit?: number;
+    profile?: string;
+    timeout?: number;
+  }
+): any {
+  opts = opts || {};
 
-	const qs = {
-		search: search,
-		action: 'opensearch',
-		redirects: opts.redirects || 'resolve',
-		suggest: true,
-		profile: opts.profile || 'normal',
-		limit: opts.limit || 10,
-		timeout: opts.timeout,
-	};
+  const qs = {
+    search: search,
+    action: "opensearch",
+    redirects: opts.redirects || "resolve",
+    suggest: true,
+    profile: opts.profile || "normal",
+    limit: opts.limit || 10,
+    timeout: opts.timeout
+  };
 
-	const options = createOptions(lang, qs);
+  const { url, ...options } = createOptions(lang, qs);
 
-	return request(options);
+  return request(url, options);
+}
+
+export async function prefixSearch(
+  lang: string,
+  name: string,
+  options: { gpslimit?: number; timeout?: number } = {}
+): Promise<{ pageid: number; title: string; extract: string }[]> {
+  const qs = {
+    ...options,
+    action: "query",
+    generator: "prefixsearch",
+    gpssearch: name,
+    gpsprofile: "normal",
+    prop: "extracts",
+    exintro: 1,
+    explaintext: 1,
+    redirects: 1
+  };
+
+  const results = await query(lang, qs);
+
+  return Object.keys(results.query.pages).map(
+    (pageid) => results.query.pages[pageid]
+  );
 }
 
 export function search(lang: string, srsearch: string): any {
-	const qs = {
-		srsearch: srsearch,
-		list: 'search',
-		srprop: 'size'
-	};
+  const qs = {
+    srsearch: srsearch,
+    list: "search",
+    srprop: "size"
+  };
 
-	return query(lang, qs);
+  return query(lang, qs);
 }
