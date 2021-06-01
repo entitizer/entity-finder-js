@@ -74,7 +74,7 @@ export async function prefixSearch(
 
   const results = await query(lang, qs);
 
-  if (!results || !results.query || !!results.query.pages) return [];
+  if (!results || !results.query || !results.query.pages) return [];
 
   return Object.keys(results.query.pages).map(
     (pageid) => results.query.pages[pageid]
