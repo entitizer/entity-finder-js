@@ -10,7 +10,7 @@ export default async function <T>(
     method: "GET",
     responseType: "json",
     headers: { "User-Agent": "entity-finder" },
-    timeout: 5 * 1000,
+    timeout: 15 * 1000,
     ...options
   });
 
