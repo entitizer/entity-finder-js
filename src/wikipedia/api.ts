@@ -37,7 +37,7 @@ export function openSearch(
     profile?: string;
     timeout?: number;
   }
-): any {
+): Promise<any[]> {
   opts = opts || {};
 
   const qs = {
@@ -46,8 +46,7 @@ export function openSearch(
     redirects: opts.redirects || "resolve",
     suggest: true,
     profile: opts.profile || "normal",
-    limit: opts.limit || 10,
-    timeout: opts.timeout
+    limit: opts.limit || 10
   };
 
   const { url, ...options } = createOptions(lang, qs);
