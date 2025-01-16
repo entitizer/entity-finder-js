@@ -1,11 +1,11 @@
 "use strict";
 
 const debug = require("debug")("entity-finder");
-const wikiData = require("wikipedia-data");
 
 import * as wikiApi from "./wikipedia/api";
 import { PageTitle } from "./types";
 import { searchTitles, SearchTitleOptions } from "./searchTitles";
+import { getDisambiguationName } from "./utils";
 
 export interface FindTitleOptions extends SearchTitleOptions {}
 
@@ -100,8 +100,4 @@ function isDezambiguizationCategory(category: string, lang: string) {
     debug(`Category ${category} is a dizambiguization`);
   }
   return isDis;
-}
-
-function getDisambiguationName(lang: string): string {
-  return wikiData.getDisambiguationNames2()[lang];
 }

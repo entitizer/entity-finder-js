@@ -20,12 +20,12 @@ function createOptions(lang: string, qs: any): any {
   return options;
 }
 
-export function query(lang: string, qs: any = {}): Promise<any> {
+export function query<T = any>(lang: string, qs: any = {}): Promise<T> {
   qs.action = "query";
 
   const { url, ...options } = createOptions(lang, qs);
 
-  return request(url, options);
+  return request<T>(url, options);
 }
 
 export function openSearch(
@@ -88,4 +88,35 @@ export function search(lang: string, srsearch: string): any {
   };
 
   return query(lang, qs);
+}
+
+export function searchWithExtracts(
+  lang: string,
+  srsearch: string,
+  options: {}
+) {
+  const qs = {
+    gsrsearch: srsearch, // Search term
+    generator: "search", // Use generator for search results
+    prop: "extracts", // Include extracts in the response
+    exintro: 1, // Limit extracts to the introduction
+    explaintext: 1, // Plain text extracts without HTML
+    format: "json", // Response format
+    utf8: 1 // Ensure UTF-8 encoding
+  };
+
+  return query<{
+    query: {
+      pages: Record<
+        string,
+        {
+          pageid: number;
+          ns: number;
+          title: string;
+          index: number;
+          extract: string;
+        }
+      >;
+    };
+  }>(lang, { ...options, ...qs });
 }

@@ -1,10 +1,10 @@
 "use strict";
 
 const debug = require("debug")("entity-finder");
-const wikiData = require("wikipedia-data");
 
 import * as wikiApi from "./wikipedia/api";
 import { PageTitle } from "./types";
+import { formatTitle, getDisambiguationName } from "./utils";
 
 export interface SearchTitleOptions {
   limit?: number;
@@ -46,7 +46,7 @@ export function searchTitles(
         const title = list[i];
 
         if (title.simple) {
-          const disName = getDisambiguationNames(lang);
+          const disName = getDisambiguationName(lang);
           debug(`special name ${title.special} -> ${disName}`);
           if (disName.toLowerCase() === title.special.toLowerCase()) {
             continue;
@@ -60,23 +60,6 @@ export function searchTitles(
       debug("filterd titles", titles);
       return titles;
     });
-}
-
-function formatTitle(title: string): PageTitle {
-  var result = /\(([^)]+)\)$/i.exec(title);
-  const pageTitle: PageTitle = {
-    title: title
-  };
-  if (result) {
-    pageTitle.simple = pageTitle.title.substr(0, result.index).trim();
-    pageTitle.special = result[1];
-  }
-
-  return pageTitle;
-}
-
-function getDisambiguationNames(lang: string): string {
-  return wikiData.getDisambiguationNames2()[lang];
 }
 
 function orderByTags(

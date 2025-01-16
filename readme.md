@@ -7,9 +7,9 @@ It will omit any wikipedia disambiguization pages.
 ## Usage
 
 ```js
-import { findTitles } from 'entity-finder';
+import { find } from 'entity-finder';
 
-const name = 'democratic party';
+const name = 'democratic party thailand';
 const lang = 'en';
 const titles = await findTitles(name, lang, { limit: 1, tags: 'thailand' });
 const title = titles[0]:
@@ -19,25 +19,20 @@ const title = titles[0]:
 //   simple: 'Democrat Party',
 //   special: 'Thailand',
 //   description: 'The Democrat Party (Thai: พรรคประชาธิปัตย์; RTGS: prachathipat) is a Thai political party...',
-//   categories:
-//     [ 'Category:1946 establishments in Thailand',
-//       'Category:Classical liberal parties' ]
 // }
 
 ```
 
 ## API
 
-### findTitles(name: string, lang: string, options?): Promise<PageTitle[]>
+### find(name: string, lang: string, options?): Promise<PageTitle[]>
 
 Finds entities. Returns an array of entities ordered by relevance.
 
-- **name** (String), required - Entity name: `Italy`.
+- **name** (String), required - Entity name: `Italy`. Maybe any text: `David the sculpture`.
 - **lang** (String), required - Language 2 chars code: `en`.
 - **options** (Object), optional - Options object:
   - **limit** (Number) - Maxim number of entities to return. Default: 2.
-  - **tags** ([String]) (null) - Order results by tags score.
-  - **orderByTagsLimit** (Number) - Limit titles ordered by tags.
 
 #### PageTitle
 
@@ -47,11 +42,16 @@ export type PageTitle = {
   simple?: string
   special?: string
   description?: string
+  about?: string
   categories?: string[]
 }
 ```
 
 ## Changelog
+
+### v0.7.0 - Jan 16, 2025
+
+- expose only `find` function
 
 ### v0.6.0 - May 31, 2021
 
