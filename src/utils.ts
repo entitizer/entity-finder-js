@@ -56,7 +56,7 @@ export function removeNestedParentheses(text: string): string {
  * Smart 1st phrase. Works for any case: . ?, !, etc.
  * ? "? Hello, world! How are you?" -> "Hello, world"
  */
-export function firstPhrase(text: string, min = 30): string {
+export function firstPhrase(text: string, min = 50): string {
   // Define sentence-ending punctuation marks for various languages
   const sentenceEndings = /[.!?¿¡,;]/g;
 

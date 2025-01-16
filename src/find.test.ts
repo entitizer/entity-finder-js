@@ -21,7 +21,7 @@ test("should sort titles by tags", async (t) => {
 
   t.is(name, titles[0].simple);
   t.is(titles[0].special, "cântăreț", "Adrian Ursu (cântăreț)");
-  t.is("Adrian Ursu este un cântăreț", titles[0].about);
+  t.is("Adrian Ursu este un cântăreț, cantautor și prezentator TV din Republica Moldova", titles[0].about);
 });
 
 test("should (NOT?) find a complex title: Adrian Ursu (cântăreț)", async (t) => {
@@ -32,7 +32,7 @@ test("should (NOT?) find a complex title: Adrian Ursu (cântăreț)", async (t) 
 
   t.is("Adrian Ursu", titles[0].simple);
   t.is(titles[0].special, "cântăreț", "Adrian Ursu (cântăreț)");
-  t.is("Adrian Ursu este un cântăreț", titles[0].about);
+  t.is("Adrian Ursu este un cântăreț, cantautor și prezentator TV din Republica Moldova", titles[0].about);
 });
 
 test("should not find Disambiguation titles: Moldova (dezambiguizare)", async (t) => {

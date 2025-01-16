@@ -37,7 +37,7 @@ export async function find(
       ...formatTitle(item.title),
       description: removeNestedParentheses(item.extract),
       about: item.extract
-        ? firstPhrase(removeNestedParentheses(item.extract), 25)
+        ? firstPhrase(removeNestedParentheses(item.extract), 50)
             .trim()
             .replace(/[.!?¿¡,;]$/, "")
             .trim()
