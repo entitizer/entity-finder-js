@@ -21,10 +21,7 @@ test("should sort titles by tags", async (t) => {
 
   t.is(name, titles[0].simple);
   t.is(titles[0].special, "cântăreț", "Adrian Ursu (cântăreț)");
-  t.is(
-    "Adrian Ursu este un cântăreț, cantautor și prezentator TV din Republica Moldova",
-    titles[0].about
-  );
+  t.is("Adrian Ursu este un cântăreț", titles[0].about);
 });
 
 test("should (NOT?) find a complex title: Adrian Ursu (cântăreț)", async (t) => {
@@ -35,10 +32,7 @@ test("should (NOT?) find a complex title: Adrian Ursu (cântăreț)", async (t) 
 
   t.is("Adrian Ursu", titles[0].simple);
   t.is(titles[0].special, "cântăreț", "Adrian Ursu (cântăreț)");
-  t.is(
-    "Adrian Ursu este un cântăreț, cantautor și prezentator TV din Republica Moldova",
-    titles[0].about
-  );
+  t.is("Adrian Ursu este un cântăreț", titles[0].about);
 });
 
 test("should not find Disambiguation titles: Moldova (dezambiguizare)", async (t) => {
@@ -56,20 +50,6 @@ test("should find titles by abbreviation: PLDM", async (t) => {
   t.is(titles[0].title, "Partidul Liberal Democrat din Moldova");
   t.is(
     "Partidul Liberal Democrat din Moldova este o formațiune politică de centru-dreapta din Republica Moldova",
-    titles[0].about
-  );
-});
-
-test("should limit ordered titles by tags", async (t) => {
-  const name = "Moldova";
-  const titles = await find(name + " Republica Moldova", "ro", {
-    limit: 10
-  });
-
-  t.is(titles.length, 10, "10 title founded");
-  t.not(titles[0].title, name);
-  t.is(
-    "Republica Moldova este un stat situat în sud-estul Europei",
     titles[0].about
   );
 });

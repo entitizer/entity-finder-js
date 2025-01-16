@@ -39,7 +39,7 @@ export async function find(
       about: item.extract
         ? firstPhrase(removeNestedParentheses(item.extract), 25)
             .trim()
-            .replace(/[.!?¿¡]$/, "")
+            .replace(/[.!?¿¡,;]$/, "")
             .trim()
         : undefined
     }));

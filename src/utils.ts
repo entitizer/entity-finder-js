@@ -45,16 +45,20 @@ export function removeNestedParentheses(text: string): string {
     }
   }
 
-  return chars.join("").replace(/\s+/g, " ").trim(); // Clean up extra spaces
+  return chars
+    .join("")
+    .replace(/\s+/g, " ")
+    .replace(/\s+([,;.])/g, "$1")
+    .trim(); // Clean up extra spaces
 }
 
 /**
  * Smart 1st phrase. Works for any case: . ?, !, etc.
  * ? "? Hello, world! How are you?" -> "Hello, world"
  */
-export function firstPhrase(text: string, min = 10): string {
+export function firstPhrase(text: string, min = 30): string {
   // Define sentence-ending punctuation marks for various languages
-  const sentenceEndings = /[.!?¿¡]/g;
+  const sentenceEndings = /[.!?¿¡,;]/g;
 
   let accumulatedText = "";
   let match;
