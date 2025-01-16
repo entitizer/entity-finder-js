@@ -30,6 +30,8 @@ export async function find(
     gsrlimit: limit
   });
 
+  if (!result || !result.query || !result.query.pages) return [];
+
   const list = Object.entries(result.query.pages)
     .map(([, value]) => value)
     .sort((a, b) => a.index - b.index)
