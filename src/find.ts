@@ -1,6 +1,6 @@
 "use strict";
 
-const debug = require("debug")("entity-finder");
+import createDebug from "debug";
 
 import { searchWithExtracts } from "./wikipedia/api";
 import { PageTitle } from "./types";
@@ -9,25 +9,30 @@ import {
   formatTitle,
   getDisambiguationName,
   removeNestedParentheses,
-  similarityScore
+  similarityScore,
 } from "./utils";
+
+const debug = createDebug("entity-finder");
 
 export interface FindOptions {
   limit?: number;
+  timeout?: number;
+  headers?: { [key: string]: string };
 }
 
 export async function find(
   name: string,
   lang: string,
-  options: FindOptions = {}
+  options: FindOptions = {},
 ): Promise<PageTitle[]> {
   lang = lang.trim().toLowerCase();
   name = name.trim();
 
   const limit = options.limit || 2;
 
-  const result = await searchWithExtracts(lang, name, {
-    gsrlimit: limit
+  const result = await searchWithExtracts(lang, name, options.headers || {}, {
+    gsrlimit: limit,
+    timeout: options.timeout,
   });
 
   if (!result || !result.query || !result.query.pages) return [];
@@ -43,14 +48,14 @@ export async function find(
             .trim()
             .replace(/[.!?¿¡,;]$/, "")
             .trim()
-        : undefined
+        : undefined,
     }));
 
   list.forEach((item) => {
     item.titleScore = similarityScore(name, item.title);
     item.score = similarityScore(
       name,
-      [item.title, item.about].filter(Boolean).join(" ")
+      [item.title, item.about].filter(Boolean).join(" "),
     );
   });
 
@@ -58,12 +63,10 @@ export async function find(
 
   debug("unfiltered titles", list);
   const titles: PageTitle[] = [];
-  for (let i = 0; i < list.length; i++) {
-    const title = list[i];
-
-    if (title.simple) {
+  for (const title of list) {
+    if (title.simple && title.special) {
       debug(`special name ${title.special} -> ${disName}`);
-      if (disName.toLowerCase() === title.special.toLowerCase()) {
+      if (disName && disName.toLowerCase() === title.special.toLowerCase()) {
         continue;
       }
     }

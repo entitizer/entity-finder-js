@@ -11,16 +11,15 @@ import { find } from 'entity-finder';
 
 const name = 'democratic party thailand';
 const lang = 'en';
-const titles = await findTitles(name, lang, { limit: 1, tags: 'thailand' });
-const title = titles[0]:
+const titles = await find(name, lang, { limit: 1 });
+const title = titles[0];
 // title =
-// { 
+// {
 //   title: 'Democrat Party (Thailand)',
 //   simple: 'Democrat Party',
 //   special: 'Thailand',
 //   description: 'The Democrat Party (Thai: พรรคประชาธิปัตย์; RTGS: prachathipat) is a Thai political party...',
 // }
-
 ```
 
 ## API
@@ -49,6 +48,19 @@ export type PageTitle = {
 
 ## Changelog
 
+### v1.0.0 - Apr 29, 2026
+
+- modernize codebase: TypeScript strict mode, ES2020 target, Node `>=18`
+- replace `require("debug")` with ES imports; bump `debug` to v4
+- fix dropped headers in `wikipedia.openSearch` (typo `readers` → `headers`)
+- fix `searchTitles` crashing when `description` is undefined
+- fix `find` accidentally filtering primary results that lacked a `(special)` suffix
+- request `User-Agent` is now derived from `package.json` (with contact URL) and overridable via `ENTITY_FINDER_USER_AGENT`
+- convert promise chains in `findTitles` to `async/await`
+- modernize `run.js` CLI (arg validation, error handling)
+- bump dev deps: `typescript` v5, `rimraf` v5, add `@types/debug`
+- remove dead `wiki-entity` commented code
+
 ### v0.7.0 - Jan 16, 2025
 
 - expose only `find` function
@@ -59,18 +71,18 @@ export type PageTitle = {
 - remove `request` dependency.
 - sixes
 
-### v0.5.1 - Match 21, 2018
+### v0.5.1 - March 21, 2018
 
 - New option: `orderByTagsLimit` - Limits titles ordered by tags.
 
-### v0.5.0 - Match 17, 2018
+### v0.5.0 - March 17, 2018
 
 - search only for titles
 - updated API
 - filters dezambiguization titles (Category:Dezambiguization)
 - updated `options` param
 
-### v0.4.0 - Match 18, 2017
+### v0.4.0 - March 18, 2017
 
 - using module [wiki-entity](https://github.com/entitizer/wiki-entity-js)
 - new results: returns an array of [WikiEntity](https://github.com/entitizer/wiki-entity-js#wikientity)

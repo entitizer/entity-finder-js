@@ -1,6 +1,8 @@
 import { PageTitle } from "./types";
 
-const wikiData = require("wikipedia-data");
+// `wikipedia-data` ships only as CJS without types.
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const wikiData: { getDisambiguationNames(): Record<string, string> } = require("wikipedia-data");
 
 export function countWords(title: string): number {
   return title.split(/[\s-]+/g).length;
@@ -11,9 +13,9 @@ export function isWikidataId(id: string) {
 }
 
 export function formatTitle(title: string): PageTitle {
-  var result = /\(([^)]+)\)$/i.exec(title);
+  const result = /\(([^)]+)\)$/i.exec(title);
   const pageTitle: PageTitle = {
-    title: title
+    title: title,
   };
   if (result) {
     pageTitle.simple = pageTitle.title.substring(0, result.index).trim();

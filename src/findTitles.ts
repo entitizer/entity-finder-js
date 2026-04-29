@@ -1,18 +1,20 @@
 "use strict";
 
-const debug = require("debug")("entity-finder");
+import createDebug from "debug";
 
 import * as wikiApi from "./wikipedia/api";
 import { PageTitle } from "./types";
 import { searchTitles, SearchTitleOptions } from "./searchTitles";
 import { getDisambiguationName } from "./utils";
 
+const debug = createDebug("entity-finder");
+
 export interface FindTitleOptions extends SearchTitleOptions {}
 
-export function findTitles(
+export async function findTitles(
   name: string,
   lang: string,
-  options: FindTitleOptions
+  options?: FindTitleOptions,
 ): Promise<PageTitle[]> {
   options = options || {};
   name = name.trim();
@@ -22,69 +24,76 @@ export function findTitles(
   const searchOptions: SearchTitleOptions = {
     limit: limit + 50,
     tags: options.tags,
-    timeout: options.timeout
+    timeout: options.timeout,
+    headers: options.headers,
   };
 
-  return searchTitles(name, lang, searchOptions)
-    .then((titles) => {
-      titles = titles.slice(0, limit + 5);
-      return filterDezambiguizationTitles(titles, lang).then((filteredTitles) =>
-        titles
-          .map((item) => filteredTitles.find((it) => it.title === item.title))
-          .filter((item) => !!item)
-      );
-    })
-    .then((list) => list.slice(0, limit));
+  let titles = await searchTitles(name, lang, searchOptions);
+  titles = titles.slice(0, limit + 5);
+
+  const filteredTitles = await filterDezambiguizationTitles(
+    titles,
+    lang,
+    options.headers || {},
+  );
+
+  return titles
+    .map((item) => filteredTitles.find((it) => it.title === item.title))
+    .filter((item): item is PageTitle => !!item)
+    .slice(0, limit);
 }
 
-function filterDezambiguizationTitles(
+async function filterDezambiguizationTitles(
   pageTitles: PageTitle[],
-  lang: string
+  lang: string,
+  headers: { [key: string]: string },
 ): Promise<PageTitle[]> {
   if (pageTitles.length === 0) {
-    return Promise.resolve([]);
+    return [];
   }
 
   const titles = pageTitles.map((item) => item.title).join("|");
 
-  return wikiApi
-    .query(lang, {
-      titles: titles,
-      prop: "categories",
-      clshow: "!hidden",
-      cllimit: 50
-    })
-    .then<PageTitle[]>((data) => {
-      if (!data.query) {
-        return Promise.reject(new Error(JSON.stringify(data)));
-      }
-      data = data.query.pages;
-      const filteredTitles = Object.keys(data)
-        .map<{ pageid: number; title: string; categories: string[] }>(
-          (pageId) => ({
-            pageid: data[pageId].pageid,
-            title: data[pageId].title,
-            categories:
-              data[pageId].categories &&
-              data[pageId].categories.map((item: any) => item.title)
-          })
-        )
-        .filter((item) => !hasADezambiguizationCategory(item.categories, lang))
-        .map((item) => {
-          const title = pageTitles.find((it) => it.title === item.title);
-          title.categories = item.categories;
-          return title;
-        });
+  const data = await wikiApi.query(lang, headers, {
+    titles: titles,
+    prop: "categories",
+    clshow: "!hidden",
+    cllimit: 50,
+  });
 
-      return filteredTitles;
+  if (!data.query) {
+    throw new Error(JSON.stringify(data));
+  }
+
+  const pages: Record<
+    string,
+    { pageid: number; title: string; categories?: { title: string }[] }
+  > = data.query.pages;
+
+  return Object.keys(pages)
+    .map((pageId) => ({
+      pageid: pages[pageId].pageid,
+      title: pages[pageId].title,
+      categories:
+        pages[pageId].categories &&
+        pages[pageId].categories!.map((item) => item.title),
+    }))
+    .filter((item) => !hasADezambiguizationCategory(item.categories, lang))
+    .map((item) => {
+      const title = pageTitles.find((it) => it.title === item.title)!;
+      title.categories = item.categories;
+      return title;
     });
 }
 
-function hasADezambiguizationCategory(categories: string[], lang: string) {
+function hasADezambiguizationCategory(
+  categories: string[] | undefined,
+  lang: string,
+) {
   return (
-    categories &&
+    !!categories &&
     categories.findIndex((category) =>
-      isDezambiguizationCategory(category, lang)
+      isDezambiguizationCategory(category, lang),
     ) > -1
   );
 }

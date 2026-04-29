@@ -1,25 +1,26 @@
 {
-    "compilerOptions": {
-        "module": "commonjs",
-        "outDir": "lib",
-        "rootDir": "./src",
-        "target": "es6",
-        "noImplicitAny": true,
-        "removeComments": true,
-        "preserveConstEnums": true,
-        "sourceMap": false,
-        "moduleResolution": "node",
-        "declaration": true,
-        "declarationDir": "types",
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
-        "allowJs": false
-    },
-    "formatCodeOptions": {
-        "indentSize": 2,
-        "tabSize": 2
-    },
-    "include": [
-        "src/**/*.ts"
-    ]
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node10",
+    "outDir": "lib",
+    "rootDir": "./src",
+    "target": "es2020",
+    "lib": ["es2020"],
+    "types": ["node"],
+    "strict": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": false,
+    "declaration": true,
+    "declarationDir": "types",
+    "allowJs": false
+  },
+  "include": ["src/**/*.ts"]
 }
+

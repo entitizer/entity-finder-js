@@ -7,11 +7,11 @@ test("should filter Disambiguation pages", async (t) => {
   const specialNames = ["cântăreț", "jurnalist"];
   t.is(titles.length, 2, "2 titles founded");
 
-  t.is(name, titles[0].simple);
-  t.true(specialNames.indexOf(titles[0].special) > -1, "has a special name");
+  t.is(titles[0]!.simple, name);
+  t.true(specialNames.indexOf(titles[0]!.special!) > -1, "has a special name");
 
-  t.is(name, titles[1].simple);
-  t.true(specialNames.indexOf(titles[1].special) > -1, "has a special name");
+  t.is(titles[1]!.simple, name);
+  t.true(specialNames.indexOf(titles[1]!.special!) > -1, "has a special name");
 });
 
 test("ru", async (t) => {
@@ -25,6 +25,6 @@ test("Brashov", async (t) => {
   const name = "Brashov";
   const titles = await findTitles(name, "ro", { limit: 10 });
   t.true(titles.length > 0, "min 1 title found");
-  const title = titles[0];
+  const title = titles[0]!;
   t.is(title.title, "Brașov", "Found Brașov");
 });

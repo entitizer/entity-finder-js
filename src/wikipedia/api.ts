@@ -4,26 +4,33 @@ import request, { RequestOptions } from "../request";
 
 const OPTIONS: RequestOptions = {
   params: {
-    format: "json"
-  }
+    format: "json",
+  },
 };
 
 /**
  * Create request options: url, qs, headers
  */
-function createOptions(lang: string, qs: any): any {
-  const options = {
+function createOptions(
+  lang: string,
+  qs: Record<string, unknown>,
+  headers: { [key: string]: string },
+) {
+  return {
     params: Object.assign({}, qs || {}, OPTIONS.params),
-    url: "https://" + lang + ".wikipedia.org/w/api.php"
+    url: "https://" + lang + ".wikipedia.org/w/api.php",
+    headers: headers || {},
   };
-
-  return options;
 }
 
-export function query<T = any>(lang: string, qs: any = {}): Promise<T> {
+export function query<T = any>(
+  lang: string,
+  headers: { [key: string]: string },
+  qs: Record<string, unknown> = {},
+): Promise<T> {
   qs.action = "query";
 
-  const { url, ...options } = createOptions(lang, qs);
+  const { url, ...options } = createOptions(lang, qs, headers);
 
   return request<T>(url, options);
 }
@@ -36,7 +43,8 @@ export function openSearch(
     limit?: number;
     profile?: string;
     timeout?: number;
-  }
+    headers?: { [key: string]: string };
+  },
 ): Promise<any[]> {
   opts = opts || {};
 
@@ -46,10 +54,10 @@ export function openSearch(
     redirects: opts.redirects || "resolve",
     suggest: true,
     profile: opts.profile || "normal",
-    limit: opts.limit || 10
+    limit: opts.limit || 10,
   };
 
-  const { url, ...options } = createOptions(lang, qs);
+  const { url, ...options } = createOptions(lang, qs, opts.headers || {});
 
   return request(url, options);
 }
@@ -57,7 +65,8 @@ export function openSearch(
 export async function prefixSearch(
   lang: string,
   name: string,
-  options: { gpslimit?: number; timeout?: number } = {}
+  options: { gpslimit?: number; timeout?: number } = {},
+  headers: { [key: string]: string } = {},
 ): Promise<{ pageid: number; title: string; extract: string }[]> {
   const qs = {
     ...options,
@@ -68,41 +77,52 @@ export async function prefixSearch(
     prop: "extracts",
     exintro: 1,
     explaintext: 1,
-    redirects: 1
+    redirects: 1,
   };
 
-  const results = await query(lang, qs);
+  const results = await query<{
+    query?: {
+      pages?: Record<
+        string,
+        { pageid: number; title: string; extract: string }
+      >;
+    };
+  }>(lang, headers, qs);
 
   if (!results || !results.query || !results.query.pages) return [];
 
-  return Object.keys(results.query.pages).map(
-    (pageid) => results.query.pages[pageid]
-  );
+  const pages = results.query.pages;
+  return Object.keys(pages).map((pageid) => pages[pageid]);
 }
 
-export function search(lang: string, srsearch: string): any {
+export function search(
+  lang: string,
+  srsearch: string,
+  headers: { [key: string]: string },
+) {
   const qs = {
     srsearch: srsearch,
     list: "search",
-    srprop: "size"
+    srprop: "size",
   };
 
-  return query(lang, qs);
+  return query(lang, headers, qs);
 }
 
 export function searchWithExtracts(
   lang: string,
   srsearch: string,
-  options: {}
+  headers: { [key: string]: string },
+  options: Record<string, unknown>,
 ) {
   const qs = {
-    gsrsearch: srsearch, // Search term
-    generator: "search", // Use generator for search results
-    prop: "extracts", // Include extracts in the response
-    exintro: 1, // Limit extracts to the introduction
-    explaintext: 1, // Plain text extracts without HTML
-    format: "json", // Response format
-    utf8: 1 // Ensure UTF-8 encoding
+    gsrsearch: srsearch,
+    generator: "search",
+    prop: "extracts",
+    exintro: 1,
+    explaintext: 1,
+    format: "json",
+    utf8: 1,
   };
 
   return query<{
@@ -118,5 +138,5 @@ export function searchWithExtracts(
         }
       >;
     };
-  }>(lang, { ...options, ...qs });
+  }>(lang, headers, { ...options, ...qs });
 }

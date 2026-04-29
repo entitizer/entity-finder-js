@@ -1,36 +1,38 @@
 {
   "name": "entity-finder",
-  "version": "0.7.3",
+  "version": "1.0.0",
   "description": "Named entity finder",
   "main": "./lib/index.js",
   "types": "./types/index.d.ts",
   "scripts": {
-    "pretest": "npm run clean && npm run tsc",
+    "build": "tsc",
+    "clean": "rimraf ./lib ./types",
+    "prebuild": "npm run clean",
+    "pretest": "npm run build",
     "test": "ava --no-cache --verbose lib/**/*.test.js",
-    "posttest": "npm run clean-test-code",
+    "posttest": "rimraf \"./lib/**/*.test.js\" \"./types/**/*.test.d.ts\"",
     "tsc": "tsc",
     "tscw": "tsc -w",
-    "preversion": "npm run tsc",
+    "preversion": "npm run build",
     "postversion": "git push --follow-tags",
-    "prepublishOnly": "npm run tsc && npm run clean-test-code",
-    "clean": "rimraf ./lib && rimraf ./types",
-    "clean-test-code": "rimraf ./lib/**/*.test.js && rimraf ./types/**/*.test.d.ts",
+    "prepublishOnly": "npm run build && rimraf \"./lib/**/*.test.js\" \"./types/**/*.test.d.ts\"",
     "find": "node ./run.js"
   },
   "engines": {
-    "node": ">=6.0.0"
+    "node": ">=18"
   },
   "dependencies": {
     "atonic": "^1.0.4",
-    "axios": "^0.21.1",
+    "axios": "^1.15.2",
+    "debug": "^4.3.4",
     "wikipedia-data": "^0.1.1"
   },
   "devDependencies": {
-    "@types/node": "latest",
-    "ava": "^0.23.0",
-    "debug": "^3.1.0",
-    "rimraf": "^2.6.2",
-    "typescript": "latest"
+    "@types/debug": "^4.1.13",
+    "@types/node": "^20.0.0",
+    "ava": "^8.0.0",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.4.0"
   },
   "repository": {
     "type": "git",
