@@ -3,7 +3,5 @@
 node_modules
 *.log
 *.tgz
-lib
-types
-package-lock.json
-yarn.lock
+dist
+coverage

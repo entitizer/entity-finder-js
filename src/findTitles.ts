@@ -1,112 +1,98 @@
-"use strict";
-
 import createDebug from "debug";
 
-import * as wikiApi from "./wikipedia/api";
-import { PageTitle } from "./types";
-import { searchTitles, SearchTitleOptions } from "./searchTitles";
-import { getDisambiguationName } from "./utils";
+import { toEntityPage } from "./entity.js";
+import { fetchLimit, normalizeLimit, normalizeName } from "./options.js";
+import type { EntityPage, FindTitlesOptions } from "./types.js";
+import { normalizeText, wordCoverage } from "./text.js";
+import { normalizeLang, prefixSearchPages } from "./wikipedia/api.js";
 
-const debug = createDebug("entity-finder");
+const debug = createDebug("entity-finder:find-titles");
 
-export interface FindTitleOptions extends SearchTitleOptions {}
-
+/**
+ * Finds entities with Wikipedia's *prefix* search, which matches from the start
+ * of the title. Use it when the query already is an entity name; use
+ * {@link find} for descriptive queries.
+ *
+ * Wikipedia's own ordering is preserved (it is title-aware and hard to beat for
+ * prefixes); `tags` can pull context-matching results to the front.
+ */
 export async function findTitles(
   name: string,
   lang: string,
-  options?: FindTitleOptions,
-): Promise<PageTitle[]> {
-  options = options || {};
-  name = name.trim();
-  lang = (lang && lang.trim().toLowerCase()) || "en";
+  options: FindTitlesOptions = {},
+): Promise<EntityPage[]> {
+  const query = normalizeName(name);
+  const language = normalizeLang(lang);
+  const limit = normalizeLimit(options.limit);
+  const includeDisambiguation = options.includeDisambiguation ?? false;
 
-  const limit = options.limit || 2;
-  const searchOptions: SearchTitleOptions = {
-    limit: limit + 50,
-    tags: options.tags,
-    timeout: options.timeout,
-    headers: options.headers,
-  };
-
-  let titles = await searchTitles(name, lang, searchOptions);
-  titles = titles.slice(0, limit + 5);
-
-  const filteredTitles = await filterDezambiguizationTitles(
-    titles,
-    lang,
-    options.headers || {},
-  );
-
-  return titles
-    .map((item) => filteredTitles.find((it) => it.title === item.title))
-    .filter((item): item is PageTitle => !!item)
-    .slice(0, limit);
-}
-
-async function filterDezambiguizationTitles(
-  pageTitles: PageTitle[],
-  lang: string,
-  headers: { [key: string]: string },
-): Promise<PageTitle[]> {
-  if (pageTitles.length === 0) {
-    return [];
-  }
-
-  const titles = pageTitles.map((item) => item.title).join("|");
-
-  const data = await wikiApi.query(lang, headers, {
-    titles: titles,
-    prop: "categories",
-    clshow: "!hidden",
-    cllimit: 50,
+  const pages = await prefixSearchPages(language, query, {
+    ...options,
+    limit: fetchLimit(limit, includeDisambiguation),
   });
 
-  if (!data.query) {
-    throw new Error(JSON.stringify(data));
-  }
+  debug("findTitles(%s, %s) -> %d raw pages", query, language, pages.length);
 
-  const pages: Record<
-    string,
-    { pageid: number; title: string; categories?: { title: string }[] }
-  > = data.query.pages;
+  const entities = pages
+    .map((page) => toEntityPage(page, query, language))
+    .filter((entity) => includeDisambiguation || !entity.isDisambiguation);
 
-  return Object.keys(pages)
-    .map((pageId) => ({
-      pageid: pages[pageId].pageid,
-      title: pages[pageId].title,
-      categories:
-        pages[pageId].categories &&
-        pages[pageId].categories!.map((item) => item.title),
-    }))
-    .filter((item) => !hasADezambiguizationCategory(item.categories, lang))
-    .map((item) => {
-      const title = pageTitles.find((it) => it.title === item.title)!;
-      title.categories = item.categories;
-      return title;
-    });
+  const ordered = orderByTags(entities, options.tags, options.orderByTagsLimit ?? limit);
+
+  return ordered.slice(0, limit);
 }
 
-function hasADezambiguizationCategory(
-  categories: string[] | undefined,
-  lang: string,
-) {
-  return (
-    !!categories &&
-    categories.findIndex((category) =>
-      isDezambiguizationCategory(category, lang),
-    ) > -1
+/**
+ * Moves up to `maxBoosted` tag-matching entities to the front, best match
+ * first, leaving the rest of the list in its original order.
+ */
+export function orderByTags(
+  entities: EntityPage[],
+  tags: string[] | string | undefined,
+  maxBoosted: number,
+): EntityPage[] {
+  const tagList = (Array.isArray(tags) ? tags : tags ? [tags] : [])
+    .map((tag) => normalizeText(tag))
+    .filter((tag) => tag.length > 0);
+
+  if (tagList.length === 0 || maxBoosted < 1) return entities;
+
+  const scored = entities.map((entity, position) => ({
+    entity,
+    position,
+    tagScore: tagScoreOf(entity, tagList),
+  }));
+
+  const boosted = scored
+    .filter((item) => item.tagScore > 0)
+    .toSorted((a, b) => b.tagScore - a.tagScore || a.position - b.position)
+    .slice(0, maxBoosted);
+
+  if (boosted.length === 0) return entities;
+
+  const boostedEntities = new Set(boosted.map((item) => item.entity));
+
+  debug(
+    "ordered by tags %o -> %o",
+    tagList,
+    boosted.map((item) => item.entity.title),
   );
+
+  return [
+    ...boosted.map((item) => item.entity),
+    ...entities.filter((entity) => !boostedEntities.has(entity)),
+  ];
 }
 
-function isDezambiguizationCategory(category: string, lang: string) {
-  const disName = getDisambiguationName(lang);
-  if (!disName) {
-    throw new Error(`No Disambiguation Name for language ${lang}`);
+/** A tag in the title counts more than one that only shows up in the summary. */
+function tagScoreOf(entity: EntityPage, tags: string[]): number {
+  const summary = [entity.shortDescription, entity.about, entity.extract].filter(Boolean).join(" ");
+
+  let score = 0;
+  for (const tag of tags) {
+    if (wordCoverage(tag, entity.title) === 1) score += 5;
+    else if (summary && wordCoverage(tag, summary) === 1) score += 1;
   }
-  const disNameReg = new RegExp("(^|\\b)" + disName + "(\\b|$)", "i");
-  const isDis = disNameReg.test(category);
-  if (isDis) {
-    debug(`Category ${category} is a dizambiguization`);
-  }
-  return isDis;
+
+  return score;
 }

@@ -1,78 +1,43 @@
-"use strict";
-
 import createDebug from "debug";
 
-import { searchWithExtracts } from "./wikipedia/api";
-import { PageTitle } from "./types";
-import {
-  firstPhrase,
-  formatTitle,
-  getDisambiguationName,
-  removeNestedParentheses,
-  similarityScore,
-} from "./utils";
+import { byRelevance, toEntityPage } from "./entity.js";
+import { fetchLimit, normalizeLimit, normalizeName } from "./options.js";
+import type { EntityPage, FindOptions } from "./types.js";
+import { normalizeLang, searchPages } from "./wikipedia/api.js";
 
-const debug = createDebug("entity-finder");
+const debug = createDebug("entity-finder:find");
 
-export interface FindOptions {
-  limit?: number;
-  timeout?: number;
-  headers?: { [key: string]: string };
-}
-
+/**
+ * Finds entities with Wikipedia's full-text search, so descriptive queries
+ * (`"democratic party thailand"`) work as well as bare names.
+ *
+ * Results are re-ranked by {@link EntityPage.score} and disambiguation pages are
+ * removed unless `includeDisambiguation` is set.
+ */
 export async function find(
   name: string,
   lang: string,
   options: FindOptions = {},
-): Promise<PageTitle[]> {
-  lang = lang.trim().toLowerCase();
-  name = name.trim();
+): Promise<EntityPage[]> {
+  const query = normalizeName(name);
+  const language = normalizeLang(lang);
+  const limit = normalizeLimit(options.limit);
+  const includeDisambiguation = options.includeDisambiguation ?? false;
 
-  const limit = options.limit || 2;
-
-  const result = await searchWithExtracts(lang, name, options.headers || {}, {
-    gsrlimit: limit,
-    timeout: options.timeout,
+  const pages = await searchPages(language, query, {
+    ...options,
+    limit: fetchLimit(limit, includeDisambiguation),
   });
 
-  if (!result || !result.query || !result.query.pages) return [];
+  debug("find(%s, %s) -> %d raw pages", query, language, pages.length);
 
-  const list = Object.entries(result.query.pages)
-    .map(([, value]) => value)
-    .sort((a, b) => a.index - b.index)
-    .map<PageTitle>((item) => ({
-      ...formatTitle(item.title),
-      description: removeNestedParentheses(item.extract),
-      about: item.extract
-        ? firstPhrase(removeNestedParentheses(item.extract), 50)
-            .trim()
-            .replace(/[.!?¿¡,;]$/, "")
-            .trim()
-        : undefined,
-    }));
+  const entities = pages
+    .map((page) => toEntityPage(page, query, language))
+    .filter((entity) => includeDisambiguation || !entity.isDisambiguation)
+    .toSorted(byRelevance)
+    .slice(0, limit);
 
-  list.forEach((item) => {
-    item.titleScore = similarityScore(name, item.title);
-    item.score = similarityScore(
-      name,
-      [item.title, item.about].filter(Boolean).join(" "),
-    );
-  });
+  debug("find(%s, %s) -> %d entities", query, language, entities.length);
 
-  const disName = getDisambiguationName(lang);
-
-  debug("unfiltered titles", list);
-  const titles: PageTitle[] = [];
-  for (const title of list) {
-    if (title.simple && title.special) {
-      debug(`special name ${title.special} -> ${disName}`);
-      if (disName && disName.toLowerCase() === title.special.toLowerCase()) {
-        continue;
-      }
-    }
-
-    titles.push(title);
-  }
-
-  return titles;
+  return entities;
 }
